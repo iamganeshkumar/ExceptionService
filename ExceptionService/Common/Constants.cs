@@ -8,6 +8,7 @@ namespace ExceptionService.Common
 {
     public class Constants
     {
+        public const string Enroute = "Enroute";
         public const string INSTALL = "INST";
         public const string UAT = "UAT";
         public const string Development = "Development";

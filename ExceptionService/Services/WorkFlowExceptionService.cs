@@ -24,8 +24,8 @@ namespace ExceptionService.Services
         {
             if (fistIteration)
             {
-                exceptions = _context.WorkflowExceptions.Where(i => i.CreateDate < DateTime.Now.AddDays(2)).ToList();
-                SaveLastRecord();
+                exceptions = _context.WorkflowExceptions.Where(i => i.CreateDate > DateTime.Now.AddDays(-2)).ToList();
+                //SaveLastRecord();
                 fistIteration = false;
             }
 
