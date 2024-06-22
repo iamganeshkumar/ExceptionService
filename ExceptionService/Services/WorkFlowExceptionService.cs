@@ -1,11 +1,7 @@
 ﻿using ExceptionService.Data;
+using ExceptionService.Enums;
 using ExceptionService.Interfaces;
 using ExceptionService.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExceptionService.Services
 {
@@ -24,7 +20,8 @@ namespace ExceptionService.Services
         {
             if (fistIteration)
             {
-                exceptions = _context.WorkflowExceptions.Where(i => i.CreateDate > DateTime.Now.AddDays(-2)).ToList();
+                var types = new[] { nameof(CommonExceptionType.Enroute), nameof(CommonExceptionType.OnSite), nameof(CommonExceptionType.Clear) };
+                exceptions = _context.WorkflowExceptions.Where(e => types.Contains(e.Type) && e.CreateDate > DateTime.Now.AddDays(-8)).ToList();
                 //SaveLastRecord();
                 fistIteration = false;
             }
@@ -36,7 +33,7 @@ namespace ExceptionService.Services
                 if (startWithLastException != null)
                 {
                     exceptions = _context.WorkflowExceptions.Where(i => i.CreateDate > startWithLastException.CreateDate).ToList();
-                    SaveLastRecord();
+                    //SaveLastRecord();
                 }
             }
 
