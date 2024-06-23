@@ -1,5 +1,6 @@
 ﻿using ExceptionService.Common;
 using ExceptionService.Interfaces;
+using ExceptionService.Mock.Services;
 using ExceptionService.Services;
 
 namespace ExceptionService.Factory
@@ -19,7 +20,7 @@ namespace ExceptionService.Factory
             {
                 Constants.Production => new ProductionJobServiceClient(),
                 Constants.UAT => new UATJobServiceClient(),
-                // Here we will define development
+                Constants.Development => new DevJobServiceClient(),
                 _ => new ProductionJobServiceClient(),
             };
         }
@@ -30,8 +31,8 @@ namespace ExceptionService.Factory
             {
                 Constants.Production => new ProductionWorkFlowMonitorServiceClient(),
                 Constants.UAT => new UATWorkflowMonitorServiceClient(),
-                // Here we will define development
-                _ => new ProductionWorkFlowMonitorServiceClient(),
+                Constants.Development => new DevWorkflowMonitorServiceClient(),
+                _ => new ProductionWorkFlowMonitorServiceClient()
             };
         }
     }
