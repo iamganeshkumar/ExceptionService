@@ -8,11 +8,11 @@ namespace ExceptionService.Services
     public class WorkFlowExceptionService : IWorkFlowExceptionService
     {
         static bool fistIteration = true;
-        private readonly OpsMobWwfprodContext _context;
+        private readonly OpsMobWwfContext _context;
         List<WorkflowException> exceptions = new List<WorkflowException>();
         WorkflowException lastException = new WorkflowException();
 
-        public WorkFlowExceptionService(OpsMobWwfprodContext context)
+        public WorkFlowExceptionService(OpsMobWwfContext context)
         {
             _context = context; 
         }

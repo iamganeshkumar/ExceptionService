@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExceptionService.Data;
 
-public partial class OpsMobWwfprodContext : DbContext
+public partial class OpsMobWwfContext : DbContext
 {
     private readonly IConfiguration _configuration;
-    public OpsMobWwfprodContext(IConfiguration configuration)
+    public OpsMobWwfContext(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    public OpsMobWwfprodContext(DbContextOptions<OpsMobWwfprodContext> options)
+    public OpsMobWwfContext(DbContextOptions<OpsMobWwfContext> options)
         : base(options)
     {
     }
