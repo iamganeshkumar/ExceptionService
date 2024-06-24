@@ -54,7 +54,7 @@ public class Worker : BackgroundService
                             {
                                 await ReprocessOnClearAppointmentsExceptionsAsync(request, exception.Data);
                             }
-                            else if (request.Type == ExceptionType.Clear)
+                            else if (request.Type == ExceptionType.OnSite)
                             {
                                 await ReprocessOnSiteExceptionsAsync(request, exception.Data);
                             }
@@ -77,9 +77,9 @@ public class Worker : BackgroundService
 
     private async Task ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeFromXml(xmlData, out DeserializedRequest deserializedRequest))
+        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeEnrouteFromXml(xmlData, out SetEmployeeToEnRouteRequest deserializedRequest))
         {
-            var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.AdUserName);
+            var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
             if (response != null && response.ReturnValue)
             {
@@ -94,9 +94,9 @@ public class Worker : BackgroundService
 
     private async Task ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeFromXml(xmlData, out DeserializedRequest deserializedRequest))
+        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeOnSiteFromXml(xmlData, out SetEmployeeToOnSiteRequest deserializedRequest))
         {
-            var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.AdUserName);
+            var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
             if (response != null && response.ReturnValue)
             {
@@ -111,9 +111,9 @@ public class Worker : BackgroundService
 
     private async Task ReprocessOnClearAppointmentsExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeFromXml(xmlData, out DeserializedRequest deserializedRequest))
+        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeClearFromXml(xmlData, out ClearAppointmentRequestModel deserializedRequest))
         {
-            var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.AdUserName);
+            var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
             if (response != null && response.ReturnValue)
             {
@@ -126,14 +126,52 @@ public class Worker : BackgroundService
         }
     }
 
-    public static bool TryDeserializeFromXml(string xml, out DeserializedRequest? result)
+    public static bool TryDeserializeEnrouteFromXml(string xml, out SetEmployeeToEnRouteRequest? result)
     {
-        var xmlSerializer = new XmlSerializer(typeof(DeserializedRequest));
+        var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToEnRouteRequest));
         try
         {
             using (var stringReader = new StringReader(xml))
             {
-                result = xmlSerializer.Deserialize(stringReader) as DeserializedRequest;
+                result = xmlSerializer.Deserialize(stringReader) as SetEmployeeToEnRouteRequest;
+                return result != null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing XML: {ex.Message}");
+            result = null;
+            return false;
+        }
+    }
+
+    public static bool TryDeserializeOnSiteFromXml(string xml, out SetEmployeeToOnSiteRequest? result)
+    {
+        var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToOnSiteRequest));
+        try
+        {
+            using (var stringReader = new StringReader(xml))
+            {
+                result = xmlSerializer.Deserialize(stringReader) as SetEmployeeToOnSiteRequest;
+                return result != null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deserializing XML: {ex.Message}");
+            result = null;
+            return false;
+        }
+    }
+
+    public static bool TryDeserializeClearFromXml(string xml, out ClearAppointmentRequestModel? result)
+    {
+        var xmlSerializer = new XmlSerializer(typeof(ClearAppointmentRequestModel));
+        try
+        {
+            using (var stringReader = new StringReader(xml))
+            {
+                result = xmlSerializer.Deserialize(stringReader) as ClearAppointmentRequestModel;
                 return result != null;
             }
         }

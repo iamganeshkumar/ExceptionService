@@ -21,7 +21,7 @@ namespace ExceptionService.Services
             if (fistIteration)
             {
                 var types = new[] { nameof(ExceptionType.Enroute), nameof(ExceptionType.OnSite), nameof(ExceptionType.Clear) };
-                exceptions = _context.WorkflowExceptions.Where(e => types.Contains(e.Type) && e.CreateDate > DateTime.Now.AddDays(-10)).ToList();
+                exceptions = _context.WorkflowExceptions.Where(e => types.Contains(e.Type) && e.CreateDate > DateTime.Now.AddDays(-15)).ToList();
                 //SaveLastRecord();
                 fistIteration = false;
             }

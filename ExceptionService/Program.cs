@@ -48,7 +48,6 @@ else
 // Register application services
 builder.Services.AddSingleton<IWorkFlowExceptionService, WorkFlowExceptionService>();
 builder.Services.AddSingleton<OpsMobWwfprodContext, OpsMobWwfprodContext>();
-builder.Services.AddSingleton<IXmlDeserializer, XmlDeserializer>();
 
 // Register the factory
 //builder.Services.AddSingleton<ServiceClientFactory>();
