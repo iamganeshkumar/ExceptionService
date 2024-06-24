@@ -9,13 +9,15 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IWorkFlowExceptionService _exceptionService;
-    private readonly ServiceClientFactory _serviceClientFactory;
+    private readonly IJobServiceClient _jobServiceClient;
+    //private readonly ServiceClientFactory _serviceClientFactory;
 
-    public Worker(ILogger<Worker> logger, IWorkFlowExceptionService exceptionService, ServiceClientFactory serviceClientFactory)
+    public Worker(ILogger<Worker> logger, IWorkFlowExceptionService exceptionService, IJobServiceClient jobServiceClient)
     {
         _logger = logger;
         _exceptionService = exceptionService;
-        _serviceClientFactory = serviceClientFactory;
+        //_serviceClientFactory = serviceClientFactory;
+        _jobServiceClient = jobServiceClient;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -26,16 +28,17 @@ public class Worker : BackgroundService
             {
                 var exceptions = _exceptionService.GetWorkflowExceptions();
 
+                _logger.LogInformation("Writing files");
                 if (exceptions.Count > 0)
                 {
                     foreach (var exception in exceptions.OrderByDescending(i => i.CreateDate))
                     {
-                        var jobServiceClient = _serviceClientFactory.CreateJobServiceClient();
-                        var job = await jobServiceClient.GetJobAsync(exception.JobNumber.GetValueOrDefault());
+                        //var jobServiceClient = _jobServiceClient.CreateJobServiceClient();
+                        var job = await _jobServiceClient.GetJobAsync(exception.JobNumber.GetValueOrDefault());
 
                         if (job.JobTypeId == Constants.INSTALL)
                         {
-                            var workflowMonitorClient = _serviceClientFactory.CreateWorkflowMonitorClient();
+                            //var workflowMonitorClient = _serviceClientFactory.CreateWorkflowMonitorClient();
                             var request = new WorkflowExceptionRequest
                             {
                                 Id = exception.Id,
@@ -44,20 +47,20 @@ public class Worker : BackgroundService
                                 IsBusinessError = exception.IsBusinessError ?? false,
                                 JobNumber = exception.JobNumber,
                                 JobSequenceNumber = exception.JobSeqNumber,
-                                Type = workflowMonitorClient.MapServiceExceptionTypeToCommonExceptionType(exception.Type)
+                                //Type = workflowMonitorClient.MapServiceExceptionTypeToCommonExceptionType(exception.Type)
                             };
 
                             if (request.Type == CommonExceptionType.Enroute)
                             {
-                                await ReprocessEnrouteExceptionsAsync(request, workflowMonitorClient, exception.Data);
+                                //await ReprocessEnrouteExceptionsAsync(request, workflowMonitorClient, exception.Data);
                             }
                             else if (request.Type == CommonExceptionType.Clear)
                             {
-                                await ReprocessOnClearAppointmentsExceptionsAsync(request, workflowMonitorClient, exception.Data);
+                                //await ReprocessOnClearAppointmentsExceptionsAsync(request, workflowMonitorClient, exception.Data);
                             }
                             else if (request.Type == CommonExceptionType.OnSite)
                             {
-                                await ReprocessOnSiteExceptionsAsync(request, workflowMonitorClient, exception.Data);
+                                //await ReprocessOnSiteExceptionsAsync(request, workflowMonitorClient, exception.Data);
                             }
                         }
                     }

@@ -1,6 +1,8 @@
-﻿using ExceptionService.Interfaces;
+﻿using ExceptionService.Configuration.Models;
+using ExceptionService.Interfaces;
 using ExceptionService.Models;
 using ExceptionServiceReference;
+using Microsoft.Extensions.Options;
 
 namespace ExceptionService.Services
 {
@@ -8,9 +10,10 @@ namespace ExceptionService.Services
     {
         private readonly JobServiceSoapClient _client;
 
-        public ProductionJobServiceClient()
+        public ProductionJobServiceClient
+            (IOptions<SoapEndpointOptions> endpointOptions)
         {
-            _client = new JobServiceSoapClient(JobServiceSoapClient.EndpointConfiguration.JobServiceSoap);
+            _client = new JobServiceSoapClient(JobServiceSoapClient.EndpointConfiguration.JobServiceSoap, endpointOptions.Value.ServiceBaseUrl);
         }
 
         public async Task<JobModel> GetJobAsync(long jobNumber)
@@ -22,5 +25,4 @@ namespace ExceptionService.Services
             };
         }
     }
-
 }

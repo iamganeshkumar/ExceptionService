@@ -14,16 +14,16 @@ namespace ExceptionService.Factory
             _environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
         }
 
-        public IJobServiceClient CreateJobServiceClient()
-        {
-            return _environment switch
-            {
-                Constants.Production => new ProductionJobServiceClient(),
-                Constants.UAT => new UATJobServiceClient(),
-                Constants.Development => new DevJobServiceClient(),
-                _ => new ProductionJobServiceClient(),
-            };
-        }
+        //public IJobServiceClient CreateJobServiceClient()
+        //{
+        //    return _environment switch
+        //    {
+        //        Constants.Production => new ProductionJobServiceClient(),
+        //        Constants.UAT => new UATJobServiceClient(),
+        //        Constants.Development => new DevJobServiceClient(),
+        //        _ => new ProductionJobServiceClient(),
+        //    };
+        //}
 
         public IWorkflowMonitorServiceClient CreateWorkflowMonitorClient()
         {
