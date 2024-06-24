@@ -1,7 +1,7 @@
 ﻿using System.Xml.Serialization;
 
-[XmlRoot(ElementName = "ClearAppointmentRequest")]
-public class ClearAppointmentRequest
+[XmlRoot(ElementName = "DeserializedRequest")]
+public class DeserializedRequest
 {
     [XmlElement(ElementName = "jobEmp_SeqNo")]
     public int JobEmpSeqNo { get; set; }

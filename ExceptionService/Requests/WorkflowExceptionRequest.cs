@@ -1,4 +1,4 @@
-﻿using ExceptionService.Enums;
+﻿using WorkFlowMonitorServiceReference;
 
 namespace ExceptionService.Requests
 {
@@ -10,6 +10,6 @@ namespace ExceptionService.Requests
         public bool IsBusinessError { get; set; }
         public long? JobNumber { get; set; }
         public int? JobSequenceNumber { get; set; }
-        public CommonExceptionType Type { get; set; }
+        public ExceptionType Type { get; set; }
     }
 }

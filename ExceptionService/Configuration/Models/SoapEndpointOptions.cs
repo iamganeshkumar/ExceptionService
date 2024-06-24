@@ -8,6 +8,6 @@ namespace ExceptionService.Configuration.Models
 {
     public sealed class SoapEndpointOptions
     {
-        public string ServiceBaseUrl { get; set; }
+        public string JobServiceBaseUrl { get; set; }
     }
 }

@@ -5,50 +5,14 @@ namespace ExceptionService.Services
 {
     public class XmlDeserializer : IXmlDeserializer
     {
-        public bool TryDeserializeEnrouteFromXml(string xml, out SetEmployeeToEnRouteRequest? result)
+        public bool TryDeserializeFromXml(string xml, out DeserializedRequest? result)
         {
-            var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToEnRouteRequest));
+            var xmlSerializer = new XmlSerializer(typeof(DeserializedRequest));
             try
             {
                 using (var stringReader = new StringReader(xml))
                 {
-                    result = xmlSerializer.Deserialize(stringReader) as SetEmployeeToEnRouteRequest;
-                    return result != null;
-                }
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
-        }
-
-        public bool TryDeserializeOnSiteFromXml(string xml, out SetEmployeeToOnSiteRequest? result)
-        {
-            var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToOnSiteRequest));
-            try
-            {
-                using (var stringReader = new StringReader(xml))
-                {
-                    result = xmlSerializer.Deserialize(stringReader) as SetEmployeeToOnSiteRequest;
-                    return result != null;
-                }
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
-        }
-
-        public bool TryDeserializeClearFromXml(string xml, out ClearAppointmentRequest? result)
-        {
-            var xmlSerializer = new XmlSerializer(typeof(ClearAppointmentRequest));
-            try
-            {
-                using (var stringReader = new StringReader(xml))
-                {
-                    result = xmlSerializer.Deserialize(stringReader) as ClearAppointmentRequest;
+                    result = xmlSerializer.Deserialize(stringReader) as DeserializedRequest;
                     return result != null;
                 }
             }

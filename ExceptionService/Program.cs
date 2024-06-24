@@ -2,10 +2,10 @@ using System.Net;
 using ExceptionService.Interfaces;
 using ExceptionService.Services;
 using ExceptionService.Data;
-using ExceptionService.Factory;
-using ExceptionService.Common;
 using Serilog;
 using ExceptionService.Configuration.Models;
+using ExceptionService.Common;
+using ExceptionService.Mock.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -34,20 +34,16 @@ builder.Logging.AddSerilog();
 
 builder.Services.AddHostedService<Worker>();
 
-builder.Services.AddSingleton<IJobServiceClient, ProductionJobServiceClient>();
-builder.Services.AddSingleton<IWorkflowMonitorServiceClient, ProductionWorkFlowMonitorServiceClient>();
-
-//if (Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == Constants.Production)
-//{
-//    builder.Services.AddSingleton<IJobServiceClient, ProductionJobServiceClient>();
-//    builder.Services.AddSingleton<IWorkflowMonitorServiceClient, ProductionWorkFlowMonitorServiceClient>();
-//}
-
-//if (Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == Constants.UAT)
-//{
-//    builder.Services.AddSingleton<IJobServiceClient, UATJobServiceClient>();
-//    builder.Services.AddSingleton<IWorkflowMonitorServiceClient, UATWorkflowMonitorServiceClient>();
-//}
+if (Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") == Constants.Development)
+{
+    builder.Services.AddSingleton<IJobServiceClient, DevJobServiceClient>();
+    builder.Services.AddSingleton<IWorkflowMonitorServiceClient, DevWorkflowMonitorServiceClient>();
+}
+else
+{
+    builder.Services.AddSingleton<IJobServiceClient, JobServiceClient>();
+    builder.Services.AddSingleton<IWorkflowMonitorServiceClient, WorkFlowMonitorServiceClient>();
+}
 
 // Register application services
 builder.Services.AddSingleton<IWorkFlowExceptionService, WorkFlowExceptionService>();
@@ -55,7 +51,7 @@ builder.Services.AddSingleton<OpsMobWwfprodContext, OpsMobWwfprodContext>();
 builder.Services.AddSingleton<IXmlDeserializer, XmlDeserializer>();
 
 // Register the factory
-builder.Services.AddSingleton<ServiceClientFactory>();
+//builder.Services.AddSingleton<ServiceClientFactory>();
 
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 

@@ -1,21 +1,19 @@
-﻿using ExceptionService.Enums;
-using ExceptionService.Interfaces;
-using ExceptionService.Models;
+﻿using ExceptionService.Interfaces;
 using ExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
 
 namespace ExceptionService.Services
 {
-    public class ProductionWorkFlowMonitorServiceClient : IWorkflowMonitorServiceClient
+    public class WorkFlowMonitorServiceClient : IWorkflowMonitorServiceClient
     {
         private readonly WorkflowMonitorClient _client;
 
-        public ProductionWorkFlowMonitorServiceClient()
+        public WorkFlowMonitorServiceClient()
         {
             _client = new WorkflowMonitorClient(WorkflowMonitorClient.EndpointConfiguration.BasicHttpsBinding_IWorkflowMonitor);
         }
 
-        public async Task<StandardSoapResponse> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public async Task<StandardSoapResponseOfboolean> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             var request = new WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO
             {
@@ -25,14 +23,14 @@ namespace ExceptionService.Services
                 IsBusinessError = reprocessRequest.IsBusinessError,
                 JobNumber = reprocessRequest.JobNumber,
                 JobSequenceNumber = reprocessRequest.JobSequenceNumber,
-                Type = MapCommonExceptionTypeToServiceExceptionType(reprocessRequest.Type)
+                Type = reprocessRequest.Type
             };
 
             var response = await _client.ReprocessEnrouteExceptionsAsync(request, adUserName);
-            return new StandardSoapResponse { ReturnValue = response.ReturnValue };
+            return response;
         }
 
-        public async Task<StandardSoapResponse> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public async Task<StandardSoapResponseOfboolean> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             var request = new WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO
             {
@@ -42,14 +40,14 @@ namespace ExceptionService.Services
                 IsBusinessError = reprocessRequest.IsBusinessError,
                 JobNumber = reprocessRequest.JobNumber,
                 JobSequenceNumber = reprocessRequest.JobSequenceNumber,
-                Type = MapCommonExceptionTypeToServiceExceptionType(reprocessRequest.Type)
+                Type = reprocessRequest.Type
             };
 
             var response = await _client.ReprocessOnSiteExceptionsAsync(request, adUserName);
-            return new StandardSoapResponse { ReturnValue = response.ReturnValue };
+            return response;
         }
 
-        public async Task<StandardSoapResponse> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public async Task<StandardSoapResponseOfboolean> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             var request = new WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe
             {
@@ -59,7 +57,7 @@ namespace ExceptionService.Services
                 IsBusinessError = reprocessRequest.IsBusinessError,
                 JobNumber = reprocessRequest.JobNumber,
                 JobSequenceNumber = reprocessRequest.JobSequenceNumber,
-                Type = MapCommonExceptionTypeToServiceExceptionType(reprocessRequest.Type),
+                Type = reprocessRequest.Type,
                 Payload = new ClearAppointmentRequestModel
                 {
                     adUserName = adUserName
@@ -67,28 +65,7 @@ namespace ExceptionService.Services
             };
 
             var response = await _client.ReprocessClearAppointmentExceptionsAsync(request, adUserName);
-            return new StandardSoapResponse { ReturnValue = response.ReturnValue };
-        }
-        private ExceptionType MapCommonExceptionTypeToServiceExceptionType(CommonExceptionType type)
-        {
-            return type switch
-            {
-                CommonExceptionType.Enroute => ExceptionType.Enroute,
-                CommonExceptionType.OnSite => ExceptionType.OnSite,
-                CommonExceptionType.Clear => ExceptionType.Clear,
-                _ => throw new ArgumentOutOfRangeException(nameof(type), $"Not expected exception type value: {type}")
-            };
-        }
-
-        public CommonExceptionType MapServiceExceptionTypeToCommonExceptionType(object serviceExceptionType)
-        {
-            return serviceExceptionType switch
-            {
-                ExceptionType.Enroute => CommonExceptionType.Enroute,
-                ExceptionType.OnSite => CommonExceptionType.OnSite,
-                ExceptionType.Clear => CommonExceptionType.Clear,
-                _ => throw new ArgumentOutOfRangeException(nameof(serviceExceptionType), $"Not expected exception type value: {serviceExceptionType}")
-            };
+            return response;
         }
     }
 }

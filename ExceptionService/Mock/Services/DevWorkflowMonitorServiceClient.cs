@@ -1,14 +1,14 @@
-﻿using ExceptionService.Enums;
-using ExceptionService.Interfaces;
+﻿using ExceptionService.Interfaces;
 using ExceptionService.Mock.Response;
 using ExceptionService.Models;
 using ExceptionService.Requests;
+using WorkFlowMonitorServiceReference;
 
 namespace ExceptionService.Mock.Services
 {
     public class DevWorkflowMonitorServiceClient : IWorkflowMonitorServiceClient
     {
-        public Task<StandardSoapResponse> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public Task<StandardSoapResponseOfboolean> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
             var response = new MockStandardSoapResponse
@@ -16,10 +16,10 @@ namespace ExceptionService.Mock.Services
                 ReturnValue = true // Set mock response value
             };
 
-            return Task.FromResult(new StandardSoapResponse { ReturnValue = response.ReturnValue });
+            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
         }
 
-        public Task<StandardSoapResponse> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public Task<StandardSoapResponseOfboolean> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
             var response = new MockStandardSoapResponse
@@ -27,10 +27,10 @@ namespace ExceptionService.Mock.Services
                 ReturnValue = true // Set mock response value
             };
 
-            return Task.FromResult(new StandardSoapResponse { ReturnValue = response.ReturnValue });
+            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
         }
 
-        public Task<StandardSoapResponse> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
+        public Task<StandardSoapResponseOfboolean> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
             var response = new MockStandardSoapResponse
@@ -38,20 +38,7 @@ namespace ExceptionService.Mock.Services
                 ReturnValue = true // Set mock response value
             };
 
-            return Task.FromResult(new StandardSoapResponse { ReturnValue = response.ReturnValue });
-        }
-
-        public CommonExceptionType MapServiceExceptionTypeToCommonExceptionType(object serviceExceptionType)
-        {
-            // Map mock exception types
-            return serviceExceptionType switch
-            {
-                "Enroute" => CommonExceptionType.Enroute,
-                "OnSite" => CommonExceptionType.OnSite,
-                "Clear" => CommonExceptionType.Clear,
-                _ => throw new ArgumentOutOfRangeException(nameof(serviceExceptionType), $"Not expected exception type value: {serviceExceptionType}")
-            };
+            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
         }
     }
-
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ExceptionService.Models;
+﻿using ExceptionService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExceptionService.Data;

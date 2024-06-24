@@ -1,31 +1,20 @@
 ﻿using ExceptionService.Interfaces;
 using ExceptionService.Mock.Models;
-using ExceptionService.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ExceptionServiceReference;
 
 namespace ExceptionService.Mock.Services
 {
     public class DevJobServiceClient : IJobServiceClient
     {
-        public Task<JobModel> GetJobAsync(long jobNumber)
+        public Task<Job> GetJobAsync(long jobNumber)
         {
             // Mock data
-            var job = new MockJob
+            var job = new Job
             {
                 JOBTYPE_ID = "INST" // Set mock job type ID
             };
 
-            var jobModel = new JobModel
-            {
-                JobTypeId = job.JOBTYPE_ID
-                // Map other necessary properties here
-            };
-
-            return Task.FromResult(jobModel);
+            return Task.FromResult(job);
         }
     }
 }

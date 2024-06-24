@@ -1,7 +1,7 @@
 ﻿using ExceptionService.Data;
-using ExceptionService.Enums;
 using ExceptionService.Interfaces;
 using ExceptionService.Models;
+using WorkFlowMonitorServiceReference;
 
 namespace ExceptionService.Services
 {
@@ -20,7 +20,7 @@ namespace ExceptionService.Services
         {
             if (fistIteration)
             {
-                var types = new[] { nameof(CommonExceptionType.Enroute), nameof(CommonExceptionType.OnSite), nameof(CommonExceptionType.Clear) };
+                var types = new[] { nameof(ExceptionType.Enroute), nameof(ExceptionType.OnSite), nameof(ExceptionType.Clear) };
                 exceptions = _context.WorkflowExceptions.Where(e => types.Contains(e.Type) && e.CreateDate > DateTime.Now.AddDays(-10)).ToList();
                 //SaveLastRecord();
                 fistIteration = false;

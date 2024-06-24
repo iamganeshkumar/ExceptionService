@@ -1,9 +1,9 @@
-﻿using ExceptionService.Models;
+﻿using ExceptionServiceReference;
 
 namespace ExceptionService.Interfaces
 {
     public interface IJobServiceClient
     {
-        Task<JobModel> GetJobAsync(long jobNumber);
+        Task<Job> GetJobAsync(long jobNumber);
     }
 }
