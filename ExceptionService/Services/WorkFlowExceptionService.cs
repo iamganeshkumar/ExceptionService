@@ -20,8 +20,9 @@ namespace ExceptionService.Services
         {
             if (fistIteration)
             {
-                var types = new[] { nameof(ExceptionType.Enroute), nameof(ExceptionType.OnSite), nameof(ExceptionType.Clear) };
-                exceptions = _context.WorkflowExceptions.Where(e => types.Contains(e.Type) && e.CreateDate > DateTime.Now.AddDays(-15)).ToList();
+                //var types = new[] { nameof(ExceptionType.Enroute), nameof(ExceptionType.OnSite), nameof(ExceptionType.Clear) };
+                exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-2)
+                && (e.Type == nameof(ExceptionType.Enroute) || e.Type == nameof(ExceptionType.Clear) || e.Type == nameof(ExceptionType.OnSite))).ToList();
                 //SaveLastRecord();
                 fistIteration = false;
             }
