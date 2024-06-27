@@ -1,6 +1,5 @@
 ﻿using ExceptionService.Interfaces;
 using ExceptionService.Mock.Response;
-using ExceptionService.Models;
 using ExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
 

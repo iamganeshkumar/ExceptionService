@@ -19,6 +19,18 @@ public class Worker : BackgroundService
         _workflowMonitorServiceClient = workflowMonitorServiceClient;
     }
 
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Service Started at {datetime}", DateTime.Now.ToString("yyyy-MM-dd:HH:mm"));
+        return base.StartAsync(cancellationToken);
+    }
+
+    public override Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Service Stopped at {datetime}", DateTime.Now.ToString("yyyy-MM-dd:HH:mm"));
+        return base.StopAsync(cancellationToken);
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -31,7 +43,9 @@ public class Worker : BackgroundService
                 {
                     foreach (var exception in exceptions.OrderByDescending(i => i.CreateDate))
                     {
+                        _logger.LogInformation("Getting job for job number - {id}", exception.JobNumber);
                         var job = await _jobServiceClient.GetJobAsync(exception.JobNumber.GetValueOrDefault());
+                        _logger.LogInformation("Successfully retrieved job for job number - {id}", exception.JobNumber);
 
                         if (job.JOBTYPE_ID == Constants.INSTALL)
                         {
@@ -68,7 +82,8 @@ public class Worker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while processing exceptions.");
+                _logger.LogError("An error occurred while processing exceptions in ExecuteAsync() method.");
+                _logger.LogError("Detailed Error - " + ex.ToString());
             }
 
             await Task.Delay(8000, stoppingToken);
@@ -77,56 +92,106 @@ public class Worker : BackgroundService
 
     private async Task ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeEnrouteFromXml(xmlData, out SetEmployeeToEnRouteRequest deserializedRequest))
+        try
         {
-            var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
-
-            if (response != null && response.ReturnValue)
+            if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeEnrouteFromXml(xmlData, out SetEmployeeToEnRouteRequest deserializedRequest))
             {
-                // Success in reprocessing
+                _logger.LogInformation("Deserialization in ReprocessEnrouteExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+                var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
+
+                if (response != null && response.ReturnValue)
+                {
+                    // Success in reprocessing
+                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                }
+                else
+                {
+                    // Fail to reprocess
+                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                }
             }
             else
             {
-                // Fail to reprocess
+                _logger.LogError("An error occurred while deserializing in ReprocessEnrouteExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("An error occurred while processing exceptions in ReprocessEnrouteExceptionsAsync() method.");
+            _logger.LogError("Detailed Error - " + ex.ToString());
         }
     }
 
     private async Task ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeOnSiteFromXml(xmlData, out SetEmployeeToOnSiteRequest deserializedRequest))
+        try
         {
-            var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
-
-            if (response != null && response.ReturnValue)
+            if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeOnSiteFromXml(xmlData, out SetEmployeeToOnSiteRequest deserializedRequest))
             {
-                // Success in reprocessing
+                _logger.LogInformation("Deserialization in ReprocessOnSiteExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+
+                var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
+
+                if (response != null && response.ReturnValue)
+                {
+                    // Success in reprocessing
+                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                }
+                else
+                {
+                    // Fail to reprocess
+                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                }
             }
             else
             {
-                // Fail to reprocess
+                _logger.LogError("An error occurred while deserializing in ReprocessOnSiteExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError("An error occurred while processing exceptions in ReprocessOnSiteExceptionsAsync() method.");
+            _logger.LogError("Detailed Error - " + ex.ToString());
         }
     }
 
     private async Task ReprocessOnClearAppointmentsExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string xmlData)
     {
-        if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeClearFromXml(xmlData, out ClearAppointmentRequestModel deserializedRequest))
+        try
         {
-            var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
-
-            if (response != null && response.ReturnValue)
+            if (!string.IsNullOrWhiteSpace(xmlData) && TryDeserializeClearFromXml(xmlData, out ClearAppointmentRequestModel deserializedRequest))
             {
-                // Success in reprocessing
+                _logger.LogInformation("Deserialization in ReprocessOnClearAppointmentsExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+
+                var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
+
+                if (response != null && response.ReturnValue)
+                {
+                    // Success in reprocessing
+                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                }
+                else
+                {
+                    // Fail to reprocess
+                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                }
             }
             else
             {
-                // Fail to reprocess
+                _logger.LogError("An error occurred while deserializing in ReprocessOnClearAppointmentsExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("An error occurred while processing exceptions in ReprocessOnClearAppointmentsExceptionsAsync() method.");
+            _logger.LogError("Detailed Error - " + ex.ToString());
         }
     }
 
-    public static bool TryDeserializeEnrouteFromXml(string xml, out SetEmployeeToEnRouteRequest? result)
+    public bool TryDeserializeEnrouteFromXml(string xml, out SetEmployeeToEnRouteRequest? result)
     {
         var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToEnRouteRequest));
         try
@@ -139,13 +204,13 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing XML: {ex.Message}");
             result = null;
             return false;
         }
     }
 
-    public static bool TryDeserializeOnSiteFromXml(string xml, out SetEmployeeToOnSiteRequest? result)
+    public bool TryDeserializeOnSiteFromXml(string xml, out SetEmployeeToOnSiteRequest? result)
     {
         var xmlSerializer = new XmlSerializer(typeof(SetEmployeeToOnSiteRequest));
         try
@@ -158,13 +223,13 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing XML: {ex.Message}");
             result = null;
             return false;
         }
     }
 
-    public static bool TryDeserializeClearFromXml(string xml, out ClearAppointmentRequestModel? result)
+    public bool TryDeserializeClearFromXml(string xml, out ClearAppointmentRequestModel? result)
     {
         var xmlSerializer = new XmlSerializer(typeof(ClearAppointmentRequestModel));
         try
@@ -177,7 +242,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing XML: {ex.Message}");
             result = null;
             return false;
         }
