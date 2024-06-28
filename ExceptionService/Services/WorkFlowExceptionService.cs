@@ -32,10 +32,10 @@ namespace ExceptionService.Services
                 if (fistIteration)
                 {
                     _logger.LogInformation("First iteration is true");
-                    _logger.LogInformation("Getting records from past {days} days", _records.Value.Days);
 
                     if (_records.Value.ProcessAllRecords)
                     {
+                        _logger.LogInformation("Getting All Records from Database");
                         stopwatch.Start();
                         exceptions = _context.WorkflowExceptions.ToList();
                         stopwatch.Stop();
@@ -44,6 +44,7 @@ namespace ExceptionService.Services
                     }
                     else
                     {
+                        _logger.LogInformation("Getting records from past {days} days", _records.Value.Days);
                         stopwatch.Start();
                         exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
                         && (e.Type == nameof(ExceptionType.Enroute) || e.Type == nameof(ExceptionType.Clear) || e.Type == nameof(ExceptionType.OnSite))).ToList();

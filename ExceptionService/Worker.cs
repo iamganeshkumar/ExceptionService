@@ -95,7 +95,7 @@ public class Worker : BackgroundService
                 _logger.LogError("Detailed Error - " + ex.Message);
             }
 
-            await Task.Delay(60000 * _durationOptions.Value.TimeInterval, stoppingToken);
+            await Task.Delay(60000 * _durationOptions.Value.TimeIntervalInMinutes, stoppingToken);
         }
     }
 
