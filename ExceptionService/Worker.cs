@@ -3,16 +3,21 @@ using ExceptionService.Common;
 using ExceptionService.Requests;
 using System.Xml.Serialization;
 using WorkFlowMonitorServiceReference;
+using ExceptionService.Configuration.Models;
+using Microsoft.Extensions.Options;
 
 public class Worker : BackgroundService
 {
+    private readonly IOptions<DurationOptions> _durationOptions;
     private readonly ILogger<Worker> _logger;
     private readonly IWorkFlowExceptionService _exceptionService;
     private readonly IJobServiceClient _jobServiceClient;
     private readonly IWorkflowMonitorServiceClient _workflowMonitorServiceClient;
 
-    public Worker(ILogger<Worker> logger, IWorkFlowExceptionService exceptionService, IJobServiceClient jobServiceClient, IWorkflowMonitorServiceClient workflowMonitorServiceClient)
+    public Worker(ILogger<Worker> logger, IWorkFlowExceptionService exceptionService, IJobServiceClient jobServiceClient,
+        IWorkflowMonitorServiceClient workflowMonitorServiceClient, IOptions<DurationOptions> durationOptions)
     {
+        _durationOptions = durationOptions;
         _logger = logger;
         _exceptionService = exceptionService;
         _jobServiceClient = jobServiceClient;
@@ -43,12 +48,12 @@ public class Worker : BackgroundService
                 {
                     foreach (var exception in exceptions.OrderByDescending(i => i.CreateDate))
                     {
-                        _logger.LogInformation("Getting job for job number - {id}", exception.JobNumber);
                         var job = await _jobServiceClient.GetJobAsync(exception.JobNumber.GetValueOrDefault());
-                        _logger.LogInformation("Successfully retrieved job for job number - {id}", exception.JobNumber);
 
-                        if (job.JOBTYPE_ID == Constants.INSTALL)
+                        if (job != null && job.JOBTYPE_ID == Constants.INSTALL)
                         {
+                            _logger.LogInformation("Successfully retrieved job for job number - {id}", exception.JobNumber);
+
                             var request = new WorkflowExceptionRequest
                             {
                                 Id = exception.Id,
@@ -73,6 +78,10 @@ public class Worker : BackgroundService
                                 await ReprocessOnSiteExceptionsAsync(request, exception.Data);
                             }
                         }
+                        else if (job == null)
+                        {
+                            _logger.LogError("Job retrieval was unsuccessfull for job id - {id} and job number - {jobnumber}", exception.Id, exception.JobNumber);
+                        }
                     }
                 }
                 else
@@ -83,10 +92,10 @@ public class Worker : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while processing exceptions in ExecuteAsync() method.");
-                _logger.LogError("Detailed Error - " + ex.ToString());
+                _logger.LogError("Detailed Error - " + ex.Message);
             }
 
-            await Task.Delay(8000, stoppingToken);
+            await Task.Delay(60000 * _durationOptions.Value.TimeInterval, stoppingToken);
         }
     }
 
@@ -119,7 +128,7 @@ public class Worker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError("An error occurred while processing exceptions in ReprocessEnrouteExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.ToString());
+            _logger.LogError("Detailed Error - " + ex.Message);
         }
     }
 
@@ -153,7 +162,7 @@ public class Worker : BackgroundService
         catch(Exception ex)
         {
             _logger.LogError("An error occurred while processing exceptions in ReprocessOnSiteExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.ToString());
+            _logger.LogError("Detailed Error - " + ex.Message);
         }
     }
 
@@ -187,7 +196,7 @@ public class Worker : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError("An error occurred while processing exceptions in ReprocessOnClearAppointmentsExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.ToString());
+            _logger.LogError("Detailed Error - " + ex.Message);
         }
     }
 
@@ -204,7 +213,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing Enroute XML: {ex.Message}");
             result = null;
             return false;
         }
@@ -223,7 +232,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing OnSite XML: {ex.Message}");
             result = null;
             return false;
         }
@@ -242,7 +251,7 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Error deserializing XML: {ex.Message}");
+            _logger.LogError($"Error deserializing Clear XML: {ex.Message}");
             result = null;
             return false;
         }

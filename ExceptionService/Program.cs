@@ -14,9 +14,13 @@ builder.Services.Configure<SoapEndpointOptions>(
     builder.Configuration.GetSection(
         key: nameof(SoapEndpointOptions)));
 
-builder.Services.Configure<WorkFlowMonitorTableRecords>(
+builder.Services.Configure<WorkFlowMonitorTableRecordsOptions>(
     builder.Configuration.GetSection(
-        key: nameof(WorkFlowMonitorTableRecords)));
+        key: nameof(WorkFlowMonitorTableRecordsOptions)));
+
+builder.Services.Configure<DurationOptions>(
+    builder.Configuration.GetSection(
+        key: nameof(DurationOptions)));
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()

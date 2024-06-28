@@ -2,6 +2,7 @@
 using ExceptionService.Interfaces;
 using ExceptionServiceReference;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace ExceptionService.Services
 {
@@ -20,7 +21,24 @@ namespace ExceptionService.Services
 
         public async Task<Job> GetJobAsync(long jobNumber)
         {
-            var job = await _client.GetJobAsync(jobNumber);
+            Job job = new Job();
+
+            try
+            {
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                job = await _client.GetJobAsync(jobNumber);
+                stopwatch.Stop();
+                TimeSpan elapsedTime = stopwatch.Elapsed;
+                _logger.LogInformation("Time taken to GetJob type is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in GetJobAsync() method in Services");
+                _logger.LogError("Detailed Error - " + ex.Message);
+                return null;
+            }
+
             return job;
         }
     }
