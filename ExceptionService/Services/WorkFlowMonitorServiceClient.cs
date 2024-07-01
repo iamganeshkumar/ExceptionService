@@ -10,12 +10,12 @@ namespace ExceptionService.Services
     public class WorkFlowMonitorServiceClient : IWorkflowMonitorServiceClient
     {
         private readonly ILogger<WorkFlowMonitorServiceClient> _logger;
-        private readonly WorkflowMonitorClient _client;
+        private readonly IWorkflowMonitorSoapClient _client;
 
-        public WorkFlowMonitorServiceClient(IOptions<SoapEndpointOptions> endpointOptions, ILogger<WorkFlowMonitorServiceClient> logger)
+        public WorkFlowMonitorServiceClient(IOptions<SoapEndpointOptions> endpointOptions, ILogger<WorkFlowMonitorServiceClient> logger, IWorkflowMonitorSoapClient client = null)
         {
             _logger = logger;
-            _client = new WorkflowMonitorClient(WorkflowMonitorClient.EndpointConfiguration.BasicHttpsBinding_IWorkflowMonitor, endpointOptions.Value.WorkflowMonitorServiceBaseUrl);
+            _client = client ?? new WorkflowMonitorSoapClientWrapper(new WorkflowMonitorClient(WorkflowMonitorClient.EndpointConfiguration.BasicHttpsBinding_IWorkflowMonitor, endpointOptions.Value.WorkflowMonitorServiceBaseUrl));
             _logger.LogInformation("WorkflowMonitorService Endpoint - {endpoint}", endpointOptions.Value.WorkflowMonitorServiceBaseUrl);
         }
 
