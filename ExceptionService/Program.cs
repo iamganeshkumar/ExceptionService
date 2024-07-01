@@ -63,6 +63,7 @@ else
 // Register application services
 builder.Services.AddSingleton<IWorkFlowExceptionService, WorkFlowExceptionService>();
 builder.Services.AddSingleton<OpsMobWwfContext, OpsMobWwfContext>();
+builder.Services.AddSingleton<IDeserialization, Deserialization>();
 
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 

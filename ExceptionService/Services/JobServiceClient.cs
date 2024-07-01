@@ -8,14 +8,14 @@ namespace ExceptionService.Services
 {
     public class JobServiceClient : IJobServiceClient
     {
-        private readonly JobServiceSoapClient _client;
+        private readonly IJobServiceSoapClient _client;
         private readonly ILogger _logger;
 
         public JobServiceClient
-            (IOptions<SoapEndpointOptions> endpointOptions, ILogger<JobServiceClient> logger)
+            (IOptions<SoapEndpointOptions> endpointOptions, ILogger<JobServiceClient> logger, IJobServiceSoapClient client = null)
         {
             _logger = logger;
-            _client = new JobServiceSoapClient(JobServiceSoapClient.EndpointConfiguration.JobServiceSoap, endpointOptions.Value.JobServiceBaseUrl);
+            _client = client ?? new JobServiceSoapClientWrapper(new JobServiceSoapClient(JobServiceSoapClient.EndpointConfiguration.JobServiceSoap, endpointOptions.Value.JobServiceBaseUrl));
             _logger.LogInformation("Job Service Endpoint - {endpoint}", endpointOptions.Value.JobServiceBaseUrl);
         }
 
