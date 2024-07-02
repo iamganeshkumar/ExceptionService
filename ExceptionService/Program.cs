@@ -44,7 +44,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Logging.AddSerilog();
-
+builder.Services.AddWindowsService();
 // Add services to the container
 
 builder.Services.AddHostedService<Worker>();
