@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TSOpsExceptionServiceReference
+namespace ExceptionServiceReference
 {
     
     
@@ -18,43 +18,43 @@ namespace TSOpsExceptionServiceReference
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/GetJob", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job> GetJobAsync(long Job_No);
+        System.Threading.Tasks.Task<ExceptionServiceReference.Job> GetJobAsync(long Job_No);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/GetJobList", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetJobListAsync(long[] job_NoList);
+        System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetJobListAsync(long[] job_NoList);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/GetActiveJobListForSite", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetActiveJobListForSiteAsync(long site_No);
+        System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetActiveJobListForSiteAsync(long site_No);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/GetActiveJobList", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetActiveJobListAsync(long[] site_NoList);
+        System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetActiveJobListAsync(long[] site_NoList);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/UpdateJob", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<long> UpdateJobAsync(TSOpsExceptionServiceReference.Job job, long emp_No);
+        System.Threading.Tasks.Task<long> UpdateJobAsync(ExceptionServiceReference.Job job, long emp_No);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/CancelJobBooking", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfInt64> CancelJobBookingAsync(long job_No, long emp_No, string recall_Id, int priority);
+        System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfInt64> CancelJobBookingAsync(long job_No, long emp_No, string recall_Id, int priority);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/CancelJob", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfInt64> CancelJobAsync(long job_No, long emp_No, string recall_Id, string jobCause_Id, string jobRes_Id);
+        System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfInt64> CancelJobAsync(long job_No, long emp_No, string recall_Id, string jobCause_Id, string jobRes_Id);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/GetJobScheduledArrivalDate", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfDateTime> GetJobScheduledArrivalDateAsync(long job_No);
+        System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfDateTime> GetJobScheduledArrivalDateAsync(long job_No);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/TouchJobHeader", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfBoolean> TouchJobHeaderAsync(long jobNumber);
+        System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfBoolean> TouchJobHeaderAsync(long jobNumber);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://adt.com/MasterMind/WebService/UpdateEstimatedHours", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfBoolean> UpdateEstimatedHoursAsync(long jobNumber, decimal estHours);
+        System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfBoolean> UpdateEstimatedHoursAsync(long jobNumber, decimal estHours);
     }
     
     /// <remarks/>
@@ -2058,13 +2058,13 @@ namespace TSOpsExceptionServiceReference
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public interface JobServiceSoapChannel : TSOpsExceptionServiceReference.JobServiceSoap, System.ServiceModel.IClientChannel
+    public interface JobServiceSoapChannel : ExceptionServiceReference.JobServiceSoap, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.2.0-preview1.23462.5")]
-    public partial class JobServiceSoapClient : System.ServiceModel.ClientBase<TSOpsExceptionServiceReference.JobServiceSoap>, TSOpsExceptionServiceReference.JobServiceSoap
+    public partial class JobServiceSoapClient : System.ServiceModel.ClientBase<ExceptionServiceReference.JobServiceSoap>, ExceptionServiceReference.JobServiceSoap
     {
         
         /// <summary>
@@ -2100,52 +2100,52 @@ namespace TSOpsExceptionServiceReference
         {
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job> GetJobAsync(long Job_No)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.Job> GetJobAsync(long Job_No)
         {
             return base.Channel.GetJobAsync(Job_No);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetJobListAsync(long[] job_NoList)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetJobListAsync(long[] job_NoList)
         {
             return base.Channel.GetJobListAsync(job_NoList);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetActiveJobListForSiteAsync(long site_No)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetActiveJobListForSiteAsync(long site_No)
         {
             return base.Channel.GetActiveJobListForSiteAsync(site_No);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.Job[]> GetActiveJobListAsync(long[] site_NoList)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.Job[]> GetActiveJobListAsync(long[] site_NoList)
         {
             return base.Channel.GetActiveJobListAsync(site_NoList);
         }
         
-        public System.Threading.Tasks.Task<long> UpdateJobAsync(TSOpsExceptionServiceReference.Job job, long emp_No)
+        public System.Threading.Tasks.Task<long> UpdateJobAsync(ExceptionServiceReference.Job job, long emp_No)
         {
             return base.Channel.UpdateJobAsync(job, emp_No);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfInt64> CancelJobBookingAsync(long job_No, long emp_No, string recall_Id, int priority)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfInt64> CancelJobBookingAsync(long job_No, long emp_No, string recall_Id, int priority)
         {
             return base.Channel.CancelJobBookingAsync(job_No, emp_No, recall_Id, priority);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfInt64> CancelJobAsync(long job_No, long emp_No, string recall_Id, string jobCause_Id, string jobRes_Id)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfInt64> CancelJobAsync(long job_No, long emp_No, string recall_Id, string jobCause_Id, string jobRes_Id)
         {
             return base.Channel.CancelJobAsync(job_No, emp_No, recall_Id, jobCause_Id, jobRes_Id);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfDateTime> GetJobScheduledArrivalDateAsync(long job_No)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfDateTime> GetJobScheduledArrivalDateAsync(long job_No)
         {
             return base.Channel.GetJobScheduledArrivalDateAsync(job_No);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfBoolean> TouchJobHeaderAsync(long jobNumber)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfBoolean> TouchJobHeaderAsync(long jobNumber)
         {
             return base.Channel.TouchJobHeaderAsync(jobNumber);
         }
         
-        public System.Threading.Tasks.Task<TSOpsExceptionServiceReference.SimpleResultOfBoolean> UpdateEstimatedHoursAsync(long jobNumber, decimal estHours)
+        public System.Threading.Tasks.Task<ExceptionServiceReference.SimpleResultOfBoolean> UpdateEstimatedHoursAsync(long jobNumber, decimal estHours)
         {
             return base.Channel.UpdateEstimatedHoursAsync(jobNumber, estHours);
         }
