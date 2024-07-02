@@ -1,8 +1,8 @@
-using ExceptionService.Interfaces;
-using ExceptionService.Common;
-using ExceptionService.Requests;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Common;
+using TSOpsExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
-using ExceptionService.Configuration.Models;
+using TSOpsExceptionService.Configuration.Models;
 using Microsoft.Extensions.Options;
 
 public class Worker : BackgroundService

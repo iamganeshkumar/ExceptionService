@@ -1,7 +1,7 @@
-﻿using ExceptionService.Requests;
+﻿using TSOpsExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Interfaces
+namespace TSOpsExceptionService.Interfaces
 {
     public interface IWorkflowMonitorServiceClient
     {

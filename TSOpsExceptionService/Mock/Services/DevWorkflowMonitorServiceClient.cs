@@ -1,9 +1,9 @@
-﻿using ExceptionService.Interfaces;
-using ExceptionService.Mock.Response;
-using ExceptionService.Requests;
+﻿using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Mock.Response;
+using TSOpsExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Mock.Services
+namespace TSOpsExceptionService.Mock.Services
 {
     public class DevWorkflowMonitorServiceClient : IWorkflowMonitorServiceClient
     {

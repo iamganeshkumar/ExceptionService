@@ -1,6 +1,6 @@
-﻿using ExceptionServiceReference;
+﻿using TSOpsExceptionServiceReference;
 
-namespace ExceptionService.Interfaces
+namespace TSOpsExceptionService.Interfaces
 {
     public interface IJobServiceClient
     {

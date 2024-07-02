@@ -1,11 +1,11 @@
-﻿using ExceptionService.Configuration.Models;
-using ExceptionService.Services;
-using ExceptionServiceReference;
+﻿using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Services;
+using TSOpsExceptionServiceReference;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace ExceptionService.Tests.Services
+namespace TSOpsExceptionService.Tests.Services
 {
     public class JobServiceClientTests
     {

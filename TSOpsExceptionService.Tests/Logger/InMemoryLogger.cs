@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace ExceptionService.Tests.Logger
+namespace TSOpsExceptionService.Tests.Logger
 {
     public class InMemoryLogger<T> : ILogger<T>
     {

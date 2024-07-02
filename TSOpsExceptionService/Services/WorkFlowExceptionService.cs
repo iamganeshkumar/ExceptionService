@@ -1,12 +1,12 @@
-﻿using ExceptionService.Configuration.Models;
-using ExceptionService.Data;
-using ExceptionService.Interfaces;
-using ExceptionService.Models;
+﻿using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Data;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Models;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Services
+namespace TSOpsExceptionService.Services
 {
     public class WorkFlowExceptionService : IWorkFlowExceptionService
     {

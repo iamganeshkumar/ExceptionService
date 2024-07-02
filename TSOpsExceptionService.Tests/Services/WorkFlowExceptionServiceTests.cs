@@ -1,14 +1,14 @@
-﻿using ExceptionService.Configuration.Models;
-using ExceptionService.Data;
-using ExceptionService.Models;
-using ExceptionService.Services;
-using ExceptionService.Tests.Logger;
+﻿using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Data;
+using TSOpsExceptionService.Models;
+using TSOpsExceptionService.Services;
+using TSOpsExceptionService.Tests.Logger;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace ExceptionService.Tests.Services
+namespace TSOpsExceptionService.Tests.Services
 {
     public class WorkFlowExceptionServiceTests
     {

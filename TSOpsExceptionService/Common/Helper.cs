@@ -1,6 +1,6 @@
 ﻿using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Common
+namespace TSOpsExceptionService.Common
 {
     public static class Helper
     {

@@ -1,7 +1,7 @@
-﻿using ExceptionService.Models;
+﻿using TSOpsExceptionService.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExceptionService.Data
+namespace TSOpsExceptionService.Data
 {
     public partial class OpsMobWwfContext : DbContext
     {

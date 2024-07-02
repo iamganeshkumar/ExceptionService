@@ -1,4 +1,4 @@
-﻿namespace ExceptionService.Common
+﻿namespace TSOpsExceptionService.Common
 {
     public class Constants
     {

@@ -1,4 +1,4 @@
-﻿namespace ExceptionService.Mock.Models
+﻿namespace TSOpsExceptionService.Mock.Models
 {
     public class MockJob
     {

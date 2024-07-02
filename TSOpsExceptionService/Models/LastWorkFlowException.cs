@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ExceptionService.Models;
+namespace TSOpsExceptionService.Models;
 
 public partial class LastWorkFlowException
 {

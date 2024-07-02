@@ -1,5 +1,5 @@
-﻿using ExceptionService.Models;
-namespace ExceptionService.Interfaces
+﻿using TSOpsExceptionService.Models;
+namespace TSOpsExceptionService.Interfaces
 {
     public interface IWorkFlowExceptionService
     {

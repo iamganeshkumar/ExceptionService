@@ -1,4 +1,4 @@
-﻿namespace ExceptionService.Configuration.Models
+﻿namespace TSOpsExceptionService.Configuration.Models
 {
     public sealed class DurationOptions
     {

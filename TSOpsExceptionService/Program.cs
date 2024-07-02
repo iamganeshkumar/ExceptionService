@@ -1,11 +1,11 @@
 using System.Net;
-using ExceptionService.Interfaces;
-using ExceptionService.Services;
-using ExceptionService.Data;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Services;
+using TSOpsExceptionService.Data;
 using Serilog;
-using ExceptionService.Configuration.Models;
-using ExceptionService.Common;
-using ExceptionService.Mock.Services;
+using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Common;
+using TSOpsExceptionService.Mock.Services;
 using Serilog.Events;
 
 var builder = Host.CreateApplicationBuilder(args);

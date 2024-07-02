@@ -1,10 +1,10 @@
-﻿using ExceptionService.Configuration.Models;
-using ExceptionService.Interfaces;
-using ExceptionServiceReference;
+﻿using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionServiceReference;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
-namespace ExceptionService.Services
+namespace TSOpsExceptionService.Services
 {
     public class JobServiceClient : IJobServiceClient
     {

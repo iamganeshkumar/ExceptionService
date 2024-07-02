@@ -1,9 +1,9 @@
-﻿using ExceptionService.Services;
+﻿using TSOpsExceptionService.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Tests.Services
+namespace TSOpsExceptionService.Tests.Services
 {
     public class DeserializationTests
     {

@@ -1,14 +1,14 @@
-﻿using ExceptionService.Configuration.Models;
-using ExceptionService.Interfaces;
-using ExceptionService.Requests;
-using ExceptionService.Services;
-using ExceptionService.Tests.Logger;
+﻿using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Requests;
+using TSOpsExceptionService.Services;
+using TSOpsExceptionService.Tests.Logger;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Tests.Services
+namespace TSOpsExceptionService.Tests.Services
 {
     public class WorkFlowMonitorServiceClientTests
     {

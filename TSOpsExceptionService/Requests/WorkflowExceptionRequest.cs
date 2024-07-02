@@ -1,6 +1,6 @@
 ﻿using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Requests
+namespace TSOpsExceptionService.Requests
 {
     public class WorkflowExceptionRequest
     {

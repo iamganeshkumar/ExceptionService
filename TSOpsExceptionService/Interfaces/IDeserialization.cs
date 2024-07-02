@@ -1,6 +1,6 @@
 ﻿using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Interfaces
+namespace TSOpsExceptionService.Interfaces
 {
     public interface IDeserialization
     {

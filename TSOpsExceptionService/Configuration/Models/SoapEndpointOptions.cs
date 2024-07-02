@@ -1,5 +1,5 @@
 ﻿using System;
-namespace ExceptionService.Configuration.Models
+namespace TSOpsExceptionService.Configuration.Models
 {
     public sealed class SoapEndpointOptions
     {

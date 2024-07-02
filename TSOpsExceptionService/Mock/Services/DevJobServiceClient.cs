@@ -1,8 +1,7 @@
-﻿using ExceptionService.Interfaces;
-using ExceptionService.Mock.Models;
-using ExceptionServiceReference;
+﻿using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionServiceReference;
 
-namespace ExceptionService.Mock.Services
+namespace TSOpsExceptionService.Mock.Services
 {
     public class DevJobServiceClient : IJobServiceClient
     {

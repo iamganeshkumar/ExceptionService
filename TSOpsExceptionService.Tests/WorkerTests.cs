@@ -1,15 +1,15 @@
-using ExceptionService.Common;
-using ExceptionService.Configuration.Models;
-using ExceptionService.Interfaces;
-using ExceptionService.Models;
-using ExceptionService.Requests;
-using ExceptionServiceReference;
+using TSOpsExceptionService.Common;
+using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Models;
+using TSOpsExceptionService.Requests;
+using TSOpsExceptionServiceReference;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Tests
+namespace TSOpsExceptionService.Tests
 {
     public class WorkerTests
     {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExceptionService.Models;
+namespace TSOpsExceptionService.Models;
 
 public partial class WorkflowException
 {

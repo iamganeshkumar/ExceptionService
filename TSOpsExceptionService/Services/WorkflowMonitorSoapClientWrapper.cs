@@ -1,7 +1,7 @@
-﻿using ExceptionService.Interfaces;
+﻿using TSOpsExceptionService.Interfaces;
 using WorkFlowMonitorServiceReference;
 
-namespace ExceptionService.Services
+namespace TSOpsExceptionService.Services
 {
     public class WorkflowMonitorSoapClientWrapper : IWorkflowMonitorSoapClient
     {

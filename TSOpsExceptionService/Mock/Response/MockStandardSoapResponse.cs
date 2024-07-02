@@ -1,4 +1,4 @@
-﻿namespace ExceptionService.Mock.Response
+﻿namespace TSOpsExceptionService.Mock.Response
 {
     public class MockStandardSoapResponse
     {
