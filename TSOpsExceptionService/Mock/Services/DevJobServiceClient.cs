@@ -1,5 +1,5 @@
 ﻿using TSOpsExceptionService.Interfaces;
-using TSOpsExceptionServiceReference;
+using ExceptionServiceReference;
 
 namespace TSOpsExceptionService.Mock.Services
 {

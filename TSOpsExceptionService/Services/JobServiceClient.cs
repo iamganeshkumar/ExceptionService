@@ -1,6 +1,6 @@
 ﻿using TSOpsExceptionService.Configuration.Models;
 using TSOpsExceptionService.Interfaces;
-using TSOpsExceptionServiceReference;
+using ExceptionServiceReference;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 

@@ -1,4 +1,4 @@
-﻿using TSOpsExceptionServiceReference;
+﻿using ExceptionServiceReference;
 
 public interface IJobServiceSoapClient
 {

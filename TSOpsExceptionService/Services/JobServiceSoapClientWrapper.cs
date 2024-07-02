@@ -1,4 +1,4 @@
-﻿using TSOpsExceptionServiceReference;
+﻿using ExceptionServiceReference;
 
 public class JobServiceSoapClientWrapper : IJobServiceSoapClient
 {
