@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ExceptionService\TSOpsExceptionService.csproj" />
+    <ProjectReference Include="..\TSOpsExceptionService\TSOpsExceptionService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

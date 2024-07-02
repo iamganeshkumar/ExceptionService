@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-ExceptionService-611a981c-5050-408a-a899-84a50f40193c</UserSecretsId>
+    <UserSecretsId>dotnet-TSOpsExceptionService-611a981c-5050-408a-a899-84a50f40193c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
