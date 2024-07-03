@@ -60,7 +60,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Equal(expectedResponse, response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Request for reprocessing Enroute Exceptions"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessEnrouteException is"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessEnrouteException for jobnumber"));
         }
 
         [Fact]
@@ -127,7 +127,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Equal(expectedResponse, response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Request for reprocessing OnSite Exceptions"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessOnSiteException is"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessOnSiteException for jobnumber"));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Equal(expectedResponse, response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Request for reprocessing Clear Exceptions"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessClearAppointmentException is"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Time taken to ReprocessClearAppointmentException for jobnumber"));
         }
 
         [Fact]

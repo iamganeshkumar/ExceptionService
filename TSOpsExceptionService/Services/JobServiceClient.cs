@@ -30,7 +30,7 @@ namespace TSOpsExceptionService.Services
                 job = await _client.GetJobAsync(jobNumber);
                 stopwatch.Stop();
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-                _logger.LogInformation("Time taken to GetJob type is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                _logger.LogInformation("Time taken to GetJob type for jobnumber {jobno} is: {ElapsedMilliseconds} ms", jobNumber,  elapsedTime.TotalMilliseconds);
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 ﻿using TSOpsExceptionService.Configuration.Models;
 using TSOpsExceptionService.Services;
-using TSOpsExceptionServiceReference;
+using ExceptionServiceReference;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -37,7 +37,7 @@ namespace TSOpsExceptionService.Tests.Services
             loggerMock.Verify(log => log.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Time taken to GetJob type is")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Time taken to GetJob type for jobnumber")),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
         }

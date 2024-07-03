@@ -51,7 +51,7 @@ namespace TSOpsExceptionService.Services
                 response = await _client.ReprocessEnrouteExceptionsAsync(request, adUserName);
                 stopwatch.Stop();
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-                _logger.LogInformation("Time taken to ReprocessEnrouteException is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                _logger.LogInformation("Time taken to ReprocessEnrouteException for jobnumber {jobno} is: {ElapsedMilliseconds} ms", request.JobNumber, elapsedTime.TotalMilliseconds);
             }
             catch (Exception ex)
             {
@@ -96,7 +96,7 @@ namespace TSOpsExceptionService.Services
                 response = await _client.ReprocessOnSiteExceptionsAsync(request, adUserName);
                 stopwatch.Stop();
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-                _logger.LogInformation("Time taken to ReprocessOnSiteException is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                _logger.LogInformation("Time taken to ReprocessOnSiteException for jobnumber {jobno} is: {ElapsedMilliseconds} ms", request.JobNumber, elapsedTime.TotalMilliseconds);
             }
             catch (Exception ex)
             {
@@ -145,7 +145,7 @@ namespace TSOpsExceptionService.Services
                 response = await _client.ReprocessClearAppointmentExceptionsAsync(request, adUserName);
                 stopwatch.Stop();
                 TimeSpan elapsedTime = stopwatch.Elapsed;
-                _logger.LogInformation("Time taken to ReprocessClearAppointmentException is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                _logger.LogInformation("Time taken to ReprocessClearAppointmentException for jobnumber {jobno} is: {ElapsedMilliseconds} ms", request.JobNumber, elapsedTime.TotalMilliseconds);
             }
             catch (Exception ex)
             {

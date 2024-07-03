@@ -3,7 +3,7 @@ using TSOpsExceptionService.Configuration.Models;
 using TSOpsExceptionService.Interfaces;
 using TSOpsExceptionService.Models;
 using TSOpsExceptionService.Requests;
-using TSOpsExceptionServiceReference;
+using ExceptionServiceReference;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

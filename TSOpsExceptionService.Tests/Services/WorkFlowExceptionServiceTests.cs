@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using TSOpsExceptionService.Requests;
+using WorkFlowMonitorServiceReference;
 
 namespace TSOpsExceptionService.Tests.Services
 {
@@ -87,6 +89,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Equal(3, result.Count);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting records from past 30 days"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Retrieved 3 records"));
         }
 
         [Fact]
@@ -130,9 +133,9 @@ namespace TSOpsExceptionService.Tests.Services
 
             var context = CreateInMemoryContext();
             var workflowExceptions = new List<WorkflowException>
-        {
-            new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
-        };
+            {
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
+            };
             context.WorkflowExceptions.AddRange(workflowExceptions);
             context.SaveChanges();
 
@@ -157,9 +160,9 @@ namespace TSOpsExceptionService.Tests.Services
 
             var context = CreateInMemoryContext();
             var workflowExceptions = new List<WorkflowException>
-        {
-            new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
-        };
+            {
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
+            };
             var lastWorkFlowException = new LastWorkFlowException { Id = workflowExceptions.First().Id };
             context.WorkflowExceptions.AddRange(workflowExceptions);
             context.LastWorkFlowExceptions.Add(lastWorkFlowException);
@@ -174,6 +177,71 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Single(context.LastWorkFlowExceptions);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("already exists in LastWorkFlowException table"));
+        }
+
+        [Fact]
+        public void SaveReprocessedRecord_NewRecord_SavesRecord()
+        {
+            // Arrange
+            ResetStaticFields(); // Ensure the static field is reset
+            var logger = new InMemoryLogger<WorkFlowExceptionService>();
+            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
+
+            var context = CreateInMemoryContext();
+            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var request = new WorkflowExceptionRequest
+            {
+                Id = Guid.NewGuid(),
+                JobNumber = 123,
+                JobSequenceNumber = 1,
+                CreateDate = DateTime.Now,
+                ErrorInformation = "Error",
+                IsBusinessError = true,
+                Type = ExceptionType.Enroute
+            };
+
+            // Act
+            service.SaveReprocessedRecord(request);
+
+            // Assert
+            Assert.Single(context.ReprocessedExceptions);
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Record") && log.Message.Contains("saved in ReprocessedExceptions table"));
+        }
+
+        [Fact]
+        public void SaveReprocessedRecord_RecordAlreadyExists_DoesNotSaveRecord()
+        {
+            // Arrange
+            ResetStaticFields(); // Ensure the static field is reset
+            var logger = new InMemoryLogger<WorkFlowExceptionService>();
+            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
+
+            var context = CreateInMemoryContext();
+            var reprocessedExceptions = new List<ReprocessedException>
+            {
+                new ReprocessedException { Id = Guid.NewGuid(), JobNumber = 123, JobSequenceNo = 1, ReprocessedDateTime = DateTime.Now }
+            };
+            context.ReprocessedExceptions.AddRange(reprocessedExceptions);
+            context.SaveChanges();
+
+            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var request = new WorkflowExceptionRequest
+            {
+                Id = reprocessedExceptions.First().Id,
+                JobNumber = 123,
+                JobSequenceNumber = 1,
+                CreateDate = DateTime.Now,
+                ErrorInformation = "Error",
+                IsBusinessError = true,
+                Type = ExceptionType.Enroute
+            };
+
+            // Act
+            service.SaveReprocessedRecord(request);
+
+            // Assert
+            Assert.Single(context.ReprocessedExceptions);
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("already exists in ReprocessedExceptions table"));
         }
     }
 }

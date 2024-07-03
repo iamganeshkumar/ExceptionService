@@ -5,6 +5,7 @@ using TSOpsExceptionService.Models;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using WorkFlowMonitorServiceReference;
+using TSOpsExceptionService.Requests;
 
 namespace TSOpsExceptionService.Services
 {
@@ -37,7 +38,12 @@ namespace TSOpsExceptionService.Services
                     {
                         _logger.LogInformation("Getting All Records from Database");
                         stopwatch.Start();
-                        exceptions = _context.WorkflowExceptions.ToList();
+
+                        exceptions = _context.WorkflowExceptions.Where(e => (e.Type == nameof(ExceptionType.Enroute) 
+                        || e.Type == nameof(ExceptionType.Clear)
+                        || e.Type == nameof(ExceptionType.OnSite))
+                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber)).ToList();
+
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
                         _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
@@ -46,8 +52,15 @@ namespace TSOpsExceptionService.Services
                     {
                         _logger.LogInformation("Getting records from past {days} days", _records.Value.Days);
                         stopwatch.Start();
+
                         exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
-                        && (e.Type == nameof(ExceptionType.Enroute) || e.Type == nameof(ExceptionType.Clear) || e.Type == nameof(ExceptionType.OnSite))).ToList();
+                        && (e.Type == nameof(ExceptionType.Enroute)
+                        || e.Type == nameof(ExceptionType.Clear)
+                        || e.Type == nameof(ExceptionType.OnSite))
+                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber)).ToList();
+
+                        //exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
+                        //&& (e.Type == nameof(ExceptionType.Enroute) || e.Type == nameof(ExceptionType.Clear) || e.Type == nameof(ExceptionType.OnSite))).ToList();
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
                         _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
@@ -90,11 +103,11 @@ namespace TSOpsExceptionService.Services
             {
                 if (exceptions.Count > 0)
                 {
-                    _logger.LogInformation("Saving last retrieved record");
+                    _logger.LogInformation("Saving last retrieved record...");
 
                     lastException = exceptions.OrderByDescending(i => i.CreateDate).First();
 
-                    if (DoesNotExistInDataBase(lastException.Id))
+                    if (DoesNotExistInLastWorkFlowExceptionsTable(lastException.Id))
                     {
                         LastWorkFlowException lastWorkFlowException = new LastWorkFlowException()
                         {
@@ -104,11 +117,11 @@ namespace TSOpsExceptionService.Services
 
                         _context.LastWorkFlowExceptions.Add(lastWorkFlowException);
                         _context.SaveChanges();
-                        _logger.LogInformation("Record {id} saved in LastWorkFlowException table", lastException.Id);
+                        _logger.LogInformation("Record {id} with jobnumber {jobno} saved in LastWorkFlowException table", lastException.Id, lastException.JobNumber);
                     }
                     else
                     {
-                        _logger.LogInformation("Record {id} already exists in LastWorkFlowException table", lastException.Id);
+                        _logger.LogInformation("Record {id} with jobnumber {jobno} already exists in LastWorkFlowException table", lastException.Id, lastException.JobNumber);
                     }
                 }
             }
@@ -119,9 +132,49 @@ namespace TSOpsExceptionService.Services
             }
         }
 
-        private bool DoesNotExistInDataBase(Guid Id)
+        public void SaveReprocessedRecord(WorkflowExceptionRequest workflowExceptionRequest)
+        {
+            try
+            {
+                if (workflowExceptionRequest != null)
+                {
+                    _logger.LogInformation("Saving reprocessed record...");
+
+                    if (DoesNotExistInReprocessedExceptionsTable(workflowExceptionRequest.Id))
+                    {
+                        ReprocessedException reprocessedException = new ReprocessedException()
+                        {
+                            Id = workflowExceptionRequest.Id,
+                            JobNumber = workflowExceptionRequest.JobNumber,
+                            JobSequenceNo = workflowExceptionRequest.JobSequenceNumber,
+                            ReprocessedDateTime = DateTime.Now
+                        };
+
+                        _context.ReprocessedExceptions.Add(reprocessedException);
+                        _context.SaveChanges();
+                        _logger.LogInformation("Record {id} with jobnumber {jobnumber} saved in ReprocessedExceptions table", reprocessedException.Id, reprocessedException.JobNumber);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Record {id} with jobnumber {jobno} already exists in ReprocessedExceptions table", workflowExceptionRequest.Id, workflowExceptionRequest.JobNumber);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in SaveReprocessedRecordAsync() method");
+                _logger.LogError("Detailed Error - " + ex.Message);
+            }
+        }
+
+        private bool DoesNotExistInLastWorkFlowExceptionsTable(Guid Id)
         {
             return _context.LastWorkFlowExceptions.FirstOrDefault(i => i.Id == Id) == null;
+        }
+
+        private bool DoesNotExistInReprocessedExceptionsTable(Guid id)
+        {
+            return _context.ReprocessedExceptions.FirstOrDefault(i => i.Id == id) == null;
         }
     }
 }

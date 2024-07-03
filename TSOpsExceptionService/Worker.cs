@@ -112,6 +112,7 @@ public class Worker : BackgroundService
                 if (response != null && response.ReturnValue)
                 {
                     // Success in reprocessing
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
                 }
                 else
@@ -146,6 +147,7 @@ public class Worker : BackgroundService
                 if (response != null && response.ReturnValue)
                 {
                     // Success in reprocessing
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
                 }
                 else
@@ -180,6 +182,7 @@ public class Worker : BackgroundService
                 if (response != null && response.ReturnValue)
                 {
                     // Success in reprocessing
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
                 }
                 else
