@@ -118,6 +118,7 @@ public class Worker : BackgroundService
                 else
                 {
                     // Fail to reprocess
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
                 }
             }
@@ -153,6 +154,7 @@ public class Worker : BackgroundService
                 else
                 {
                     // Fail to reprocess
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
                 }
             }
@@ -188,6 +190,7 @@ public class Worker : BackgroundService
                 else
                 {
                     // Fail to reprocess
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
                     _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
                 }
             }
