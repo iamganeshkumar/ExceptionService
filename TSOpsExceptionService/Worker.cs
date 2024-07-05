@@ -113,18 +113,18 @@ public class Worker : BackgroundService
                 {
                     // Success in reprocessing
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
                 else
                 {
                     // Fail to reprocess
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
             }
             else
             {
-                _logger.LogError("An error occurred while deserializing in ReprocessEnrouteExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("An error occurred while deserializing in ReprocessEnrouteExceptionsAsync() method for Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
         }
@@ -141,7 +141,7 @@ public class Worker : BackgroundService
         {
             if (!string.IsNullOrWhiteSpace(xmlData) && _derialization.TryDeserializeOnSiteFromXml(xmlData, out SetEmployeeToOnSiteRequest deserializedRequest))
             {
-                _logger.LogInformation("Deserialization in ReprocessOnSiteExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+                _logger.LogInformation("Deserialization in ReprocessOnSiteExceptionsAsync for Id - {id} is successfull with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
 
                 var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
@@ -149,18 +149,18 @@ public class Worker : BackgroundService
                 {
                     // Success in reprocessing
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
                 else
                 {
                     // Fail to reprocess
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
             }
             else
             {
-                _logger.LogError("An error occurred while deserializing in ReprocessOnSiteExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("An error occurred while deserializing in ReprocessOnSiteExceptionsAsync() method with Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
         }
@@ -185,18 +185,18 @@ public class Worker : BackgroundService
                 {
                     // Success in reprocessing
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
                 else
                 {
                     // Fail to reprocess
                     _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id}", reprocessRequest.Id);
+                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
             }
             else
             {
-                _logger.LogError("An error occurred while deserializing in ReprocessOnClearAppointmentsExceptionsAsync() method with Id - {Id}", reprocessRequest.Id);
+                _logger.LogError("An error occurred while deserializing in ReprocessOnClearAppointmentsExceptionsAsync() method with Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
         }
