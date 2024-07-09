@@ -11,6 +11,7 @@ public partial class ReprocessedException
     public long? JobNumber { get; set; }
 
     public int? JobSequenceNo { get; set; }
+    public string? Type { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime ReprocessedDateTime { get; set; }

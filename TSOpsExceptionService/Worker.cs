@@ -47,7 +47,7 @@ public class Worker : BackgroundService
 
                 if (exceptions.Count > 0)
                 {
-                    foreach (var exception in exceptions.OrderByDescending(i => i.CreateDate))
+                    foreach (var exception in exceptions)
                     {
                         var job = await _jobServiceClient.GetJobAsync(exception.JobNumber.GetValueOrDefault());
 
@@ -81,7 +81,7 @@ public class Worker : BackgroundService
                         }
                         else if (job == null)
                         {
-                            _logger.LogError("Job retrieval was unsuccessfull for job id - {id} and job number - {jobnumber}", exception.Id, exception.JobNumber);
+                            _logger.LogError("Job retrieval was unsuccessfull for Id - {id} and job number - {jobnumber}", exception.Id, exception.JobNumber);
                         }
                     }
                 }
@@ -93,7 +93,7 @@ public class Worker : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while processing exceptions in ExecuteAsync() method.");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Detailed Error - " + ex);
             }
 
             await Task.Delay(60000 * _durationOptions.Value.TimeIntervalInMinutes, stoppingToken);
@@ -106,7 +106,7 @@ public class Worker : BackgroundService
         {
             if (!string.IsNullOrWhiteSpace(xmlData) && _derialization.TryDeserializeEnrouteFromXml(xmlData, out SetEmployeeToEnRouteRequest deserializedRequest))
             {
-                _logger.LogInformation("Deserialization in ReprocessEnrouteExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+                _logger.LogInformation("Deserialization in ReprocessEnrouteExceptionsAsync for Id - {id} with jobnumber {jobno} is successfull", reprocessRequest.Id, reprocessRequest.JobNumber);
                 var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
                 if (response != null && response.ReturnValue)
@@ -130,8 +130,8 @@ public class Worker : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError("An error occurred while processing exceptions in ReprocessEnrouteExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.Message);
+            _logger.LogError("An error occurred while processing exceptions in ReprocessEnrouteExceptionsAsync() method for Id - {id} with jobnumber {jobno}.", reprocessRequest.Id, reprocessRequest.JobNumber);
+            _logger.LogError("Detailed Error - " + ex);
         }
     }
 
@@ -141,7 +141,7 @@ public class Worker : BackgroundService
         {
             if (!string.IsNullOrWhiteSpace(xmlData) && _derialization.TryDeserializeOnSiteFromXml(xmlData, out SetEmployeeToOnSiteRequest deserializedRequest))
             {
-                _logger.LogInformation("Deserialization in ReprocessOnSiteExceptionsAsync for Id - {id} is successfull with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                _logger.LogInformation("Deserialization in ReprocessOnSiteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
 
                 var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
@@ -160,14 +160,14 @@ public class Worker : BackgroundService
             }
             else
             {
-                _logger.LogError("An error occurred while deserializing in ReprocessOnSiteExceptionsAsync() method with Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                _logger.LogError("An error occurred while deserializing in ReprocessOnSiteExceptionsAsync() method for Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
         }
         catch(Exception ex)
         {
             _logger.LogError("An error occurred while processing exceptions in ReprocessOnSiteExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.Message);
+            _logger.LogError("Detailed Error - " + ex);
         }
     }
 
@@ -177,7 +177,7 @@ public class Worker : BackgroundService
         {
             if (!string.IsNullOrWhiteSpace(xmlData) && _derialization.TryDeserializeClearFromXml(xmlData, out ClearAppointmentRequestModel deserializedRequest))
             {
-                _logger.LogInformation("Deserialization in ReprocessOnClearAppointmentsExceptionsAsync for Id - {id} is successfull", reprocessRequest.Id);
+                _logger.LogInformation("Deserialization is successfull in ReprocessOnClearAppointmentsExceptionsAsync for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
 
                 var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
@@ -196,14 +196,14 @@ public class Worker : BackgroundService
             }
             else
             {
-                _logger.LogError("An error occurred while deserializing in ReprocessOnClearAppointmentsExceptionsAsync() method with Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                _logger.LogError("An error occurred while deserializing in ReprocessOnClearAppointmentsExceptionsAsync() method for Id - {Id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
                 _logger.LogError("Faulted Xml - {xml}", xmlData);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError("An error occurred while processing exceptions in ReprocessOnClearAppointmentsExceptionsAsync() method.");
-            _logger.LogError("Detailed Error - " + ex.Message);
+            _logger.LogError("Detailed Error - " + ex);
         }
     } 
 }

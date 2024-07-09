@@ -72,7 +72,7 @@ namespace TSOpsExceptionService.Tests.Services
             var optionsMock = CreateMockOptions("http://localhost");
 
             mockClient.Setup(client => client.ReprocessEnrouteExceptionsAsync(It.IsAny<WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO>(), It.IsAny<string>()))
-                      .ThrowsAsync(new Exception("Test Exception"));
+                      .ThrowsAsync(new Exception());
 
             var service = new WorkFlowMonitorServiceClient(optionsMock.Object, logger, mockClient.Object);
 
@@ -93,7 +93,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Null(response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Error in ReprocessEnrouteExceptionsAsync() method in Services"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error - Test Exception"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error -"));
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace TSOpsExceptionService.Tests.Services
             var optionsMock = CreateMockOptions("http://localhost");
 
             mockClient.Setup(client => client.ReprocessOnSiteExceptionsAsync(It.IsAny<WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO>(), It.IsAny<string>()))
-                      .ThrowsAsync(new Exception("Test Exception"));
+                      .ThrowsAsync(new Exception());
 
             var service = new WorkFlowMonitorServiceClient(optionsMock.Object, logger, mockClient.Object);
 
@@ -160,7 +160,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Null(response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Error in ReprocessOnSiteExceptionsAsync() method in Services"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error - Test Exception"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error -"));
         }
 
         [Fact]
@@ -206,7 +206,7 @@ namespace TSOpsExceptionService.Tests.Services
             var optionsMock = CreateMockOptions("http://localhost");
 
             mockClient.Setup(client => client.ReprocessClearAppointmentExceptionsAsync(It.IsAny<WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe>(), It.IsAny<string>()))
-                      .ThrowsAsync(new Exception("Test Exception"));
+                      .ThrowsAsync(new Exception());
 
             var service = new WorkFlowMonitorServiceClient(optionsMock.Object, logger, mockClient.Object);
 
@@ -227,7 +227,7 @@ namespace TSOpsExceptionService.Tests.Services
             // Assert
             Assert.Null(response);
             Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Error in ReprocessClearAppointmentExceptionsAsync() method in Services"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error - Test Exception"));
+            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Error && log.Message.Contains("Detailed Error -"));
         }
     }
 }

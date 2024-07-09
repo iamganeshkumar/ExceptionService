@@ -34,8 +34,8 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error in GetJobAsync() method in Services");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in GetJobAsync() method in Services while processing jobnumber {jobno}", jobNumber);
+                _logger.LogError("Detailed Error - " + ex);
                 return null;
             }
 

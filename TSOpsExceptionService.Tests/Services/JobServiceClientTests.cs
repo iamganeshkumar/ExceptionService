@@ -51,7 +51,7 @@ namespace TSOpsExceptionService.Tests.Services
             var soapClientMock = new Mock<IJobServiceSoapClient>();
 
             soapClientMock.Setup(client => client.GetJobAsync(It.IsAny<long>()))
-                          .ThrowsAsync(new Exception("Test exception"));
+                          .ThrowsAsync(new Exception());
 
             endpointOptionsMock.Setup(o => o.Value)
                                .Returns(new SoapEndpointOptions { JobServiceBaseUrl = "http://test" });
@@ -73,7 +73,7 @@ namespace TSOpsExceptionService.Tests.Services
             loggerMock.Verify(log => log.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Detailed Error - Test exception")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Detailed Error -")),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
         }

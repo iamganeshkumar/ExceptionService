@@ -139,7 +139,7 @@ namespace TSOpsExceptionService.Tests
             loggerMock.Verify(log => log.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Job retrieval was unsuccessfull for job id")),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Job retrieval was unsuccessfull for Id")),
                 It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
         }

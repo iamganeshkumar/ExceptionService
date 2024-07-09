@@ -26,7 +26,7 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deserializing Enroute XML: {ex.Message}");
+                _logger.LogError($"Error deserializing Enroute XML: {ex}");
                 result = null;
                 return false;
             }
@@ -45,7 +45,7 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deserializing OnSite XML: {ex.Message}");
+                _logger.LogError($"Error deserializing OnSite XML: {ex}");
                 result = null;
                 return false;
             }
@@ -64,7 +64,7 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deserializing Clear XML: {ex.Message}");
+                _logger.LogError($"Error deserializing Clear XML: {ex}");
                 result = null;
                 return false;
             }

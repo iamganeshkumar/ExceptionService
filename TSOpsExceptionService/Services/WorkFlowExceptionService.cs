@@ -29,6 +29,12 @@ namespace TSOpsExceptionService.Services
             try
             {
                 Stopwatch stopwatch = new Stopwatch();
+                var typeOrder = new Dictionary<string, int>
+                        {
+                            { nameof(ExceptionType.Enroute), 1 },
+                            { nameof(ExceptionType.OnSite), 2 },
+                            { nameof(ExceptionType.Clear), 3 }
+                        };
 
                 if (fistIteration)
                 {
@@ -39,10 +45,14 @@ namespace TSOpsExceptionService.Services
                         _logger.LogInformation("Getting All Records from Database");
                         stopwatch.Start();
 
-                        exceptions = _context.WorkflowExceptions.Where(e => (e.Type == nameof(ExceptionType.Enroute) 
-                        || e.Type == nameof(ExceptionType.Clear)
-                        || e.Type == nameof(ExceptionType.OnSite))
-                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber)).ToList();
+                        exceptions = _context.WorkflowExceptions
+                            .Where(e => (e.Type == nameof(ExceptionType.Enroute) 
+                            || e.Type == nameof(ExceptionType.Clear) 
+                            || e.Type == nameof(ExceptionType.OnSite))
+                            && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
+                            .ToList()
+                            .OrderBy(e => typeOrder[e.Type])
+                            .ToList();
 
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
@@ -53,14 +63,16 @@ namespace TSOpsExceptionService.Services
                         _logger.LogInformation("Getting records from past {days} days", _records.Value.Days);
                         stopwatch.Start();
 
-                        exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
-                        && (e.Type == nameof(ExceptionType.Enroute)
-                        || e.Type == nameof(ExceptionType.Clear)
-                        || e.Type == nameof(ExceptionType.OnSite))
-                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber)).ToList();
+                        exceptions = _context.WorkflowExceptions
+                            .Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
+                            && (e.Type == nameof(ExceptionType.Enroute)
+                            || e.Type == nameof(ExceptionType.Clear)
+                            || e.Type == nameof(ExceptionType.OnSite))
+                            && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
+                            .ToList()
+                            .OrderBy(e => typeOrder[e.Type])
+                            .ToList();
 
-                        //exceptions = _context.WorkflowExceptions.Where(e => e.CreateDate > DateTime.Now.AddDays(-(_records.Value.Days))
-                        //&& (e.Type == nameof(ExceptionType.Enroute) || e.Type == nameof(ExceptionType.Clear) || e.Type == nameof(ExceptionType.OnSite))).ToList();
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
                         _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
@@ -91,7 +103,7 @@ namespace TSOpsExceptionService.Services
             catch (Exception ex)
             {
                 _logger.LogError("Error in GetWorkflowException() method");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Detailed Error - " + ex);
             }
 
             return exceptions;
@@ -127,8 +139,8 @@ namespace TSOpsExceptionService.Services
             }
             catch(Exception ex) 
             {
-                _logger.LogError("Error in SaveLastRecord() method");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in SaveLastRecord() method occurred while trying to save last record for Id {id} with jobnumber {jobno}", lastException.Id, lastException.JobNumber);
+                _logger.LogError("Detailed Error - " + ex);
             }
         }
 
@@ -145,8 +157,9 @@ namespace TSOpsExceptionService.Services
                         ReprocessedException reprocessedException = new ReprocessedException()
                         {
                             Id = workflowExceptionRequest.Id,
-                            JobNumber = workflowExceptionRequest.JobNumber,
-                            JobSequenceNo = workflowExceptionRequest.JobSequenceNumber,
+                            JobNumber = workflowExceptionRequest?.JobNumber,
+                            JobSequenceNo = workflowExceptionRequest?.JobSequenceNumber,
+                            Type = workflowExceptionRequest?.Type.ToString(),
                             ReprocessedDateTime = DateTime.Now
                         };
 
@@ -162,8 +175,8 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error in SaveReprocessedRecordAsync() method");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in SaveReprocessedRecordAsync() method occurred while trying to save reprocess record for Id {id} with jobno {jobno}", workflowExceptionRequest.Id, workflowExceptionRequest.JobNumber);
+                _logger.LogError("Detailed Error - " + ex);
             }
         }
 

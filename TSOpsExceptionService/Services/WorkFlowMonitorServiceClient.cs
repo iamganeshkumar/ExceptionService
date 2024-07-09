@@ -22,11 +22,12 @@ namespace TSOpsExceptionService.Services
         public async Task<StandardSoapResponseOfboolean> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             StandardSoapResponseOfboolean response = new StandardSoapResponseOfboolean();
+            WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO request = new WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO();
             try
             {
                 Stopwatch stopwatch = new Stopwatch();
 
-                var request = new WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO
+                request = new WorkflowExceptionModelOfSetEmployeeToEnRouteRequestbwABAbVO
                 {
                     Id = reprocessRequest.Id,
                     CreateDate = reprocessRequest.CreateDate,
@@ -55,8 +56,8 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error in ReprocessEnrouteExceptionsAsync() method in Services");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in ReprocessEnrouteExceptionsAsync() method in Services occurred while trying to reprocess enroute exception for Id {id} with jobnumber {jobno}", request.Id, request.JobNumber);
+                _logger.LogError("Detailed Error - " + ex);
                 return null;
             }
 
@@ -66,12 +67,13 @@ namespace TSOpsExceptionService.Services
         public async Task<StandardSoapResponseOfboolean> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             StandardSoapResponseOfboolean response = new StandardSoapResponseOfboolean();
+            WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO request = new WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO();
 
             try
             {
                 Stopwatch stopwatch = new Stopwatch();
 
-                var request = new WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO
+                request = new WorkflowExceptionModelOfSetEmployeeToOnSiteRequestbwABAbVO
                 {
                     Id = reprocessRequest.Id,
                     CreateDate = reprocessRequest.CreateDate,
@@ -100,8 +102,8 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error in ReprocessOnSiteExceptionsAsync() method in Services");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in ReprocessOnSiteExceptionsAsync() method in Services occurred while trying to reprocess onsite exception for Id {id} with jobnumber {jobno}", request.Id, request.JobNumber);
+                _logger.LogError("Detailed Error - " + ex);
                 return null;
             }
             return response;
@@ -110,12 +112,13 @@ namespace TSOpsExceptionService.Services
         public async Task<StandardSoapResponseOfboolean> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             StandardSoapResponseOfboolean response = new StandardSoapResponseOfboolean();
+            WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe request = new WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe();
 
             try
             {
                 Stopwatch stopwatch = new Stopwatch();
 
-                var request = new WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe
+                request = new WorkflowExceptionModelOfClearAppointmentRequestModelT2o2hOfe
                 {
                     Id = reprocessRequest.Id,
                     CreateDate = reprocessRequest.CreateDate,
@@ -149,8 +152,8 @@ namespace TSOpsExceptionService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error in ReprocessClearAppointmentExceptionsAsync() method in Services");
-                _logger.LogError("Detailed Error - " + ex.Message);
+                _logger.LogError("Error in ReprocessClearAppointmentExceptionsAsync() method in Services occurred while trying to reprocess clear exception for Id {id} with jobnumber {jobno}", request.Id, request.JobNumber);
+                _logger.LogError("Detailed Error - " + ex);
                 return null;
             }
 
