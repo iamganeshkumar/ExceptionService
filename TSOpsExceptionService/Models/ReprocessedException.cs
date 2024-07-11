@@ -15,4 +15,5 @@ public partial class ReprocessedException
 
     [Column(TypeName = "datetime")]
     public DateTime ReprocessedDateTime { get; set; }
+    public bool IsReprocessed { get; set; }
 }

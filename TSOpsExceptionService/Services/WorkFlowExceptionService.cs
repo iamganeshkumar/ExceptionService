@@ -144,7 +144,7 @@ namespace TSOpsExceptionService.Services
             }
         }
 
-        public void SaveReprocessedRecord(WorkflowExceptionRequest workflowExceptionRequest)
+        public void SaveReprocessedRecord(WorkflowExceptionRequest workflowExceptionRequest, bool isReprocessed)
         {
             try
             {
@@ -160,7 +160,8 @@ namespace TSOpsExceptionService.Services
                             JobNumber = workflowExceptionRequest?.JobNumber,
                             JobSequenceNo = workflowExceptionRequest?.JobSequenceNumber,
                             Type = workflowExceptionRequest?.Type.ToString(),
-                            ReprocessedDateTime = DateTime.Now
+                            ReprocessedDateTime = DateTime.Now,
+                            IsReprocessed = isReprocessed
                         };
 
                         _context.ReprocessedExceptions.Add(reprocessedException);

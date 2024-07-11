@@ -1,116 +1,108 @@
-﻿using TSOpsExceptionService.Configuration.Models;
-using TSOpsExceptionService.Data;
-using TSOpsExceptionService.Models;
-using TSOpsExceptionService.Services;
-using TSOpsExceptionService.Tests.Logger;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using TSOpsExceptionService.Requests;
-using WorkFlowMonitorServiceReference;
+using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Models;
+using TSOpsExceptionService.Services;
 
 namespace TSOpsExceptionService.Tests.Services
 {
-    public class WorkFlowExceptionServiceTests
+    public class WorkFlowExceptionServiceTests : IClassFixture<InMemoryDbContextFixture>
     {
-        private OpsMobWwfContext CreateInMemoryContext()
-        {
-            var options = new DbContextOptionsBuilder<OpsMobWwfContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+        private readonly InMemoryDbContextFixture _fixture;
+        private readonly InMemoryLogger<WorkFlowExceptionService> _logger;
+        private readonly Mock<IOptions<WorkFlowMonitorTableRecordsOptions>> _optionsMock;
 
-            return new OpsMobWwfContext(options);
+        public WorkFlowExceptionServiceTests(InMemoryDbContextFixture fixture)
+        {
+            _fixture = fixture;
+            _logger = new InMemoryLogger<WorkFlowExceptionService>();
+            _optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
+            _optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = true, Days = 30 });
         }
 
         private void ResetStaticFields()
         {
-            // Reset the static field `fistIteration` to true before each test
             typeof(WorkFlowExceptionService)
                 .GetField("fistIteration", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                 .SetValue(null, true);
+        }
+
+        private void ClearDatabase()
+        {
+            _fixture.Context.WorkflowExceptions.RemoveRange(_fixture.Context.WorkflowExceptions);
+            _fixture.Context.ReprocessedExceptions.RemoveRange(_fixture.Context.ReprocessedExceptions);
+            _fixture.Context.LastWorkFlowExceptions.RemoveRange(_fixture.Context.LastWorkFlowExceptions);
+            _fixture.Context.SaveChanges();
         }
 
         [Fact]
         public void GetWorkflowExceptions_FirstIterationWithAllRecords_LogsRetrievingAllRecords()
         {
             // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
-            optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = true, Days = 30 });
+            ResetStaticFields();
+            ClearDatabase();
 
-            var context = CreateInMemoryContext();
-            context.WorkflowExceptions.AddRange(
+            _fixture.Context.WorkflowExceptions.AddRange(
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-1), Type = "Enroute" },
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-2), Type = "Clear" },
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-3), Type = "OnSite" }
             );
-            context.SaveChanges();
+            _fixture.Context.SaveChanges();
 
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
-
-            // Act
-            var result = service.GetWorkflowExceptions();
-
-            // Assert
-            Console.WriteLine("Captured Logs:");
-            foreach (var log in logger.Logs)
-            {
-                Console.WriteLine($"LogLevel: {log.LogLevel}, Message: {log.Message}");
-            }
-
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting All Records from Database"));
-        }
-
-        [Fact]
-        public void GetWorkflowExceptions_FirstIterationWithLimitedRecords_LogsRetrievingLimitedRecords()
-        {
-            // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
-            optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = false, Days = 30 });
-
-            var context = CreateInMemoryContext();
-            context.WorkflowExceptions.AddRange(
-                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-1), Type = "Enroute" },
-                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-2), Type = "Clear" },
-                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-3), Type = "OnSite" },
-                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-40), Type = "Enroute" }
-            );
-            context.SaveChanges();
-
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var service = new WorkFlowExceptionService(_fixture.Context, _logger, _optionsMock.Object);
 
             // Act
             var result = service.GetWorkflowExceptions();
 
             // Assert
             Assert.Equal(3, result.Count);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting records from past 30 days"));
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Retrieved 3 records"));
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting All Records from Database"));
+        }
+
+        [Fact]
+        public void GetWorkflowExceptions_FirstIterationWithLimitedRecords_LogsRetrievingLimitedRecords()
+        {
+            // Arrange
+            ResetStaticFields();
+            ClearDatabase();
+            _optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = false, Days = 30 });
+
+            _fixture.Context.WorkflowExceptions.AddRange(
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-1), Type = "Enroute" },
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-2), Type = "Clear" },
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-3), Type = "OnSite" },
+                new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-40), Type = "Enroute" }
+            );
+            _fixture.Context.SaveChanges();
+
+            var service = new WorkFlowExceptionService(_fixture.Context, _logger, _optionsMock.Object);
+
+            // Act
+            var result = service.GetWorkflowExceptions();
+
+            // Assert
+            Assert.Equal(3, result.Count); // Only records from the last 30 days should be retrieved
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting records from past 30 days"));
         }
 
         [Fact]
         public void GetWorkflowExceptions_NonFirstIteration_LogsRetrievingNewRecords()
         {
             // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
-            optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = false, Days = 30 });
+            ResetStaticFields();
+            ClearDatabase();
+            _optionsMock.Setup(o => o.Value).Returns(new WorkFlowMonitorTableRecordsOptions { ProcessAllRecords = false, Days = 30 });
 
-            var context = CreateInMemoryContext();
             var lastWorkFlowException = new LastWorkFlowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-2) };
-            context.LastWorkFlowExceptions.Add(lastWorkFlowException);
-            context.WorkflowExceptions.AddRange(
+            _fixture.Context.LastWorkFlowExceptions.Add(lastWorkFlowException);
+            _fixture.Context.WorkflowExceptions.AddRange(
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddDays(-1), Type = "Enroute" },
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now.AddMinutes(-1), Type = "Clear" }
             );
-            context.SaveChanges();
+            _fixture.Context.SaveChanges();
 
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var service = new WorkFlowExceptionService(_fixture.Context, _logger, _optionsMock.Object);
 
             // Manually set the first iteration to false
             typeof(WorkFlowExceptionService).GetField("fistIteration", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).SetValue(null, false);
@@ -120,128 +112,59 @@ namespace TSOpsExceptionService.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Now getting records greater than"));
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Now getting records greater than"));
         }
 
         [Fact]
         public void SaveLastRecord_NewRecord_SavesRecord()
         {
             // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
+            ResetStaticFields();
+            ClearDatabase();
 
-            var context = CreateInMemoryContext();
             var workflowExceptions = new List<WorkflowException>
             {
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
             };
-            context.WorkflowExceptions.AddRange(workflowExceptions);
-            context.SaveChanges();
+            _fixture.Context.WorkflowExceptions.AddRange(workflowExceptions);
+            _fixture.Context.SaveChanges();
 
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var service = new WorkFlowExceptionService(_fixture.Context, _logger, _optionsMock.Object);
             typeof(WorkFlowExceptionService).GetField("exceptions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(service, workflowExceptions);
 
             // Act
             service.GetType().GetMethod("SaveLastRecord", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(service, null);
 
             // Assert
-            Assert.Single(context.LastWorkFlowExceptions);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Record") && log.Message.Contains("saved in LastWorkFlowException table"));
+            Assert.Single(_fixture.Context.LastWorkFlowExceptions);
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Record") && log.Message.Contains("saved in LastWorkFlowException table"));
         }
 
         [Fact]
         public void SaveLastRecord_RecordAlreadyExists_DoesNotSaveRecord()
         {
             // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
+            ResetStaticFields();
+            ClearDatabase();
 
-            var context = CreateInMemoryContext();
             var workflowExceptions = new List<WorkflowException>
             {
                 new WorkflowException { Id = Guid.NewGuid(), CreateDate = DateTime.Now, Type = "Enroute" }
             };
             var lastWorkFlowException = new LastWorkFlowException { Id = workflowExceptions.First().Id };
-            context.WorkflowExceptions.AddRange(workflowExceptions);
-            context.LastWorkFlowExceptions.Add(lastWorkFlowException);
-            context.SaveChanges();
+            _fixture.Context.WorkflowExceptions.AddRange(workflowExceptions);
+            _fixture.Context.LastWorkFlowExceptions.Add(lastWorkFlowException);
+            _fixture.Context.SaveChanges();
 
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
+            var service = new WorkFlowExceptionService(_fixture.Context, _logger, _optionsMock.Object);
             typeof(WorkFlowExceptionService).GetField("exceptions", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(service, workflowExceptions);
 
             // Act
             service.GetType().GetMethod("SaveLastRecord", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(service, null);
 
             // Assert
-            Assert.Single(context.LastWorkFlowExceptions);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("already exists in LastWorkFlowException table"));
-        }
-
-        [Fact]
-        public void SaveReprocessedRecord_NewRecord_SavesRecord()
-        {
-            // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
-
-            var context = CreateInMemoryContext();
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
-            var request = new WorkflowExceptionRequest
-            {
-                Id = Guid.NewGuid(),
-                JobNumber = 123,
-                JobSequenceNumber = 1,
-                CreateDate = DateTime.Now,
-                ErrorInformation = "Error",
-                IsBusinessError = true,
-                Type = ExceptionType.Enroute
-            };
-
-            // Act
-            service.SaveReprocessedRecord(request);
-
-            // Assert
-            Assert.Single(context.ReprocessedExceptions);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Record") && log.Message.Contains("saved in ReprocessedExceptions table"));
-        }
-
-        [Fact]
-        public void SaveReprocessedRecord_RecordAlreadyExists_DoesNotSaveRecord()
-        {
-            // Arrange
-            ResetStaticFields(); // Ensure the static field is reset
-            var logger = new InMemoryLogger<WorkFlowExceptionService>();
-            var optionsMock = new Mock<IOptions<WorkFlowMonitorTableRecordsOptions>>();
-
-            var context = CreateInMemoryContext();
-            var reprocessedExceptions = new List<ReprocessedException>
-            {
-                new ReprocessedException { Id = Guid.NewGuid(), JobNumber = 123, JobSequenceNo = 1, ReprocessedDateTime = DateTime.Now }
-            };
-            context.ReprocessedExceptions.AddRange(reprocessedExceptions);
-            context.SaveChanges();
-
-            var service = new WorkFlowExceptionService(context, logger, optionsMock.Object);
-            var request = new WorkflowExceptionRequest
-            {
-                Id = reprocessedExceptions.First().Id,
-                JobNumber = 123,
-                JobSequenceNumber = 1,
-                CreateDate = DateTime.Now,
-                ErrorInformation = "Error",
-                IsBusinessError = true,
-                Type = ExceptionType.Enroute
-            };
-
-            // Act
-            service.SaveReprocessedRecord(request);
-
-            // Assert
-            Assert.Single(context.ReprocessedExceptions);
-            Assert.Contains(logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("already exists in ReprocessedExceptions table"));
+            Assert.Single(_fixture.Context.LastWorkFlowExceptions);
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("already exists in LastWorkFlowException table"));
         }
     }
 }

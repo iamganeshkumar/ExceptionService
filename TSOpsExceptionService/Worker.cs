@@ -109,17 +109,26 @@ public class Worker : BackgroundService
                 _logger.LogInformation("Deserialization in ReprocessEnrouteExceptionsAsync for Id - {id} with jobnumber {jobno} is successfull", reprocessRequest.Id, reprocessRequest.JobNumber);
                 var response = await _workflowMonitorServiceClient.ReprocessEnrouteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
-                if (response != null && response.ReturnValue)
+                if (response == null)
                 {
-                    // Success in reprocessing
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest, false);
+                    _logger.LogError("ReprocessEnrouteExceptionsAsync is unsuccessfull for Id - {id} with jobnumber {jobno}. Response was null", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
+
                 else
                 {
-                    // Fail to reprocess
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    if (response != null && response.ReturnValue)
+                    {
+                        // Success in reprocessing
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
+                    else
+                    {
+                        // Fail to reprocess but response was 200
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessEnrouteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
                 }
             }
             else
@@ -145,17 +154,26 @@ public class Worker : BackgroundService
 
                 var response = await _workflowMonitorServiceClient.ReprocessOnSiteExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
-                if (response != null && response.ReturnValue)
+                if (response == null)
                 {
-                    // Success in reprocessing
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest, false);
+                    _logger.LogError("ReprocessOnSiteExceptionsAsync is unsuccessfull for Id - {id} with jobnumber {jobno}. Response was null", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
+
                 else
                 {
-                    // Fail to reprocess
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    if (response != null && response.ReturnValue)
+                    {
+                        // Success in reprocessing
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessOnSiteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
+                    else
+                    {
+                        // Fail to reprocess but response was 200
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessOnSiteExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
                 }
             }
             else
@@ -181,17 +199,26 @@ public class Worker : BackgroundService
 
                 var response = await _workflowMonitorServiceClient.ReprocessClearAppointmentExceptionsAsync(reprocessRequest, deserializedRequest.adUserName);
 
-                if (response != null && response.ReturnValue)
+                if (response == null)
                 {
-                    // Success in reprocessing
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    _exceptionService.SaveReprocessedRecord(reprocessRequest, false);
+                    _logger.LogError("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull for Id - {id} with jobnumber {jobno}. Response was null", reprocessRequest.Id, reprocessRequest.JobNumber);
                 }
+
                 else
                 {
-                    // Fail to reprocess
-                    _exceptionService.SaveReprocessedRecord(reprocessRequest);
-                    _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    if (response != null && response.ReturnValue)
+                    {
+                        // Success in reprocessing
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is successfull for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
+                    else
+                    {
+                        // Fail to reprocess but response was 200
+                        _exceptionService.SaveReprocessedRecord(reprocessRequest, true);
+                        _logger.LogInformation("ReprocessOnClearAppointmentsExceptionsAsync is unsuccessfull. Record already reprocessed for Id - {id} with jobnumber {jobno}", reprocessRequest.Id, reprocessRequest.JobNumber);
+                    }
                 }
             }
             else

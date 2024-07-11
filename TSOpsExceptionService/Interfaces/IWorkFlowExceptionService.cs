@@ -6,6 +6,6 @@ namespace TSOpsExceptionService.Interfaces
     public interface IWorkFlowExceptionService
     {
         public IList<WorkflowException> GetWorkflowExceptions();
-        public void SaveReprocessedRecord(WorkflowExceptionRequest request);
+        public void SaveReprocessedRecord(WorkflowExceptionRequest request, bool isReprocessed);
     }
 }

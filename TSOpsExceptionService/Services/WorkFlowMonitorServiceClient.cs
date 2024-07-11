@@ -35,18 +35,27 @@ namespace TSOpsExceptionService.Services
                     IsBusinessError = reprocessRequest.IsBusinessError,
                     JobNumber = reprocessRequest.JobNumber,
                     JobSequenceNumber = reprocessRequest.JobSequenceNumber,
-                    Type = reprocessRequest.Type
+                    Type = reprocessRequest.Type,
+                    Payload = new SetEmployeeToEnRouteRequest
+                    {
+                        adUserName = adUserName,
+                        jobEmp_SeqNo = reprocessRequest.JobSequenceNumber ?? 0,
+                        job_No = reprocessRequest.JobNumber ?? 0,
+                        utcStatusDateTime = reprocessRequest.CreateDate
+                    }
                 };
 
                 _logger.LogInformation($"Request for reprocessing Enroute Exceptions\n " +
-                                    "Id - {id}\n" +
-                                    "CreateDate - {date}\n" +
-                                    "ErrorInformation - {errinfo}\n" +
-                                    "IsBusinessError - {businesserror}\n" +
-                                    "JobNumber - {jobnumber}\n" +
-                                    "JobSequenceNumber - {jobseqnumber}\n" +
-                                    "Type - {type}", request.Id, request.CreateDate, request.ErrorInformation,
-                                    request.IsBusinessError, request.JobNumber, request.JobSequenceNumber, request.Type.ToString());
+                                    "Id - {id} \n" +
+                                    "CreateDate - {date} \n " +
+                                    "ErrorInformation - {errinfo} \n" +
+                                    "IsBusinessError - {businesserror} \n" +
+                                    "JobNumber - {jobnumber} \n" +
+                                    "JobSequenceNumber - {jobseqnumber} \n" +
+                                    "Type - {type} \n" +
+                                    "PayLoad = {payload}", request.Id, request.CreateDate, request.ErrorInformation,
+                                    request.IsBusinessError, request.JobNumber, request.JobSequenceNumber, request.Type.ToString(),
+                                    adUserName + " " + reprocessRequest.JobSequenceNumber + " " + reprocessRequest.JobNumber + " " + reprocessRequest.CreateDate.ToString());
 
                 stopwatch.Start();
                 response = await _client.ReprocessEnrouteExceptionsAsync(request, adUserName);
@@ -81,7 +90,14 @@ namespace TSOpsExceptionService.Services
                     IsBusinessError = reprocessRequest.IsBusinessError,
                     JobNumber = reprocessRequest.JobNumber,
                     JobSequenceNumber = reprocessRequest.JobSequenceNumber,
-                    Type = reprocessRequest.Type
+                    Type = reprocessRequest.Type,
+                    Payload = new SetEmployeeToOnSiteRequest
+                    {
+                        adUserName = adUserName,
+                        jobEmp_SeqNo = reprocessRequest.JobSequenceNumber ?? 0,
+                        job_No = reprocessRequest.JobNumber ?? 0,
+                        utcStatusDateTime = reprocessRequest.CreateDate
+                    }
                 };
 
                 _logger.LogInformation($"Request for reprocessing OnSite Exceptions\n " +
@@ -91,8 +107,10 @@ namespace TSOpsExceptionService.Services
                                     "IsBusinessError - {businesserror}\n" +
                                     "JobNumber - {jobnumber}\n" +
                                     "JobSequenceNumber - {jobseqnumber}\n" +
-                                    "Type - {type}", request.Id, request.CreateDate, request.ErrorInformation,
-                                    request.IsBusinessError, request.JobNumber, request.JobSequenceNumber, request.Type.ToString());
+                                    "Type - {type} \n" +
+                                    "PayLoad = {payload}", request.Id, request.CreateDate, request.ErrorInformation,
+                                    request.IsBusinessError, request.JobNumber, request.JobSequenceNumber, request.Type.ToString(),
+                                    adUserName + " " + reprocessRequest.JobSequenceNumber + " " + reprocessRequest.JobNumber + " " + reprocessRequest.CreateDate.ToString());
 
                 stopwatch.Start();
                 response = await _client.ReprocessOnSiteExceptionsAsync(request, adUserName);
