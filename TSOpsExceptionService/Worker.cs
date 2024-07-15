@@ -266,7 +266,7 @@ public class Worker : BackgroundService
             if (response != null)
             {
                 _logger.LogInformation("ReprocessEnrouteExceptionsAsync is successfull for Id - {id} with jobnumber {jobno} and seqno {seqno} in {count} attempts",
-                    reprocessRequest.Id, reprocessRequest.JobSequenceNumber, reprocessRequest.JobNumber, i + 1);
+                    reprocessRequest.Id, reprocessRequest.JobNumber, reprocessRequest.JobSequenceNumber, i + 1);
                 isReprocessed = true;
                 break;
             }
