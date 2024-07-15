@@ -35,6 +35,10 @@ builder.Services.Configure<DurationOptions>(
     builder.Configuration.GetSection(
         key: nameof(DurationOptions)));
 
+builder.Services.Configure<Retry>(
+    builder.Configuration.GetSection(
+        key: nameof(Retry)));
+
 // Ensure log directories exist
 var logDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
 Directory.CreateDirectory(Path.Combine(logDirectory, "Information"));

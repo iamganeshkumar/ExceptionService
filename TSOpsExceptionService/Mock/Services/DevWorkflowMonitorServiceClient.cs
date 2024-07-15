@@ -10,34 +10,54 @@ namespace TSOpsExceptionService.Mock.Services
         public Task<StandardSoapResponseOfboolean> ReprocessEnrouteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
-            var response = new MockStandardSoapResponse
+            try
             {
-                ReturnValue = true // Set mock response value
-            };
-
-            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+                var response = new MockStandardSoapResponse
+                {
+                    ReturnValue = true // Set mock response value
+                };
+                
+                return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+            }
+            catch (Exception ex) 
+            {
+                return Task.FromResult<StandardSoapResponseOfboolean>(null);
+            }
         }
 
         public Task<StandardSoapResponseOfboolean> ReprocessOnSiteExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
-            var response = new MockStandardSoapResponse
+            try
             {
-                ReturnValue = true // Set mock response value
-            };
-
-            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+                var response = new MockStandardSoapResponse
+                {
+                    ReturnValue = true // Set mock response value
+                };
+                return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<StandardSoapResponseOfboolean>(null);
+            }
         }
 
         public Task<StandardSoapResponseOfboolean> ReprocessClearAppointmentExceptionsAsync(WorkflowExceptionRequest reprocessRequest, string adUserName)
         {
             // Mock response
-            var response = new MockStandardSoapResponse
+            try
             {
-                ReturnValue = true // Set mock response value
-            };
+                var response = new MockStandardSoapResponse
+                {
+                    ReturnValue = true // Set mock response value
+                };
 
-            return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+                return Task.FromResult(new StandardSoapResponseOfboolean { ReturnValue = response.ReturnValue });
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult<StandardSoapResponseOfboolean>(null);
+            }
         }
     }
 }

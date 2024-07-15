@@ -1,147 +1,141 @@
-using TSOpsExceptionService.Common;
-using TSOpsExceptionService.Configuration.Models;
-using TSOpsExceptionService.Interfaces;
-using TSOpsExceptionService.Models;
-using TSOpsExceptionService.Requests;
-using ExceptionServiceReference;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using TSOpsExceptionService.Common;
+using TSOpsExceptionService.Configuration.Models;
+using TSOpsExceptionService.Interfaces;
+using TSOpsExceptionService.Requests;
 using WorkFlowMonitorServiceReference;
+using ExceptionServiceReference;
+using TSOpsExceptionService.Models;
 
 namespace TSOpsExceptionService.Tests
 {
     public class WorkerTests
     {
-        [Fact]
-        public async Task ExecuteAsync_NoExceptions_LogsNoExceptions()
+        private readonly Mock<IWorkFlowExceptionService> _mockExceptionService;
+        private readonly Mock<IJobServiceClient> _mockJobServiceClient;
+        private readonly Mock<IWorkflowMonitorServiceClient> _mockWorkflowMonitorServiceClient;
+        private readonly Mock<IDeserialization> _mockDeserialization;
+        private readonly Mock<IOptions<DurationOptions>> _mockDurationOptions;
+        private readonly Mock<IOptions<Retry>> _mockRetryOptions;
+        private readonly Mock<ILogger<Worker>> _mockLogger;
+        private readonly Worker _worker;
+
+        public WorkerTests()
         {
-            // Arrange
-            var loggerMock = new Mock<ILogger<Worker>>();
-            var exceptionServiceMock = new Mock<IWorkFlowExceptionService>();
-            var jobServiceClientMock = new Mock<IJobServiceClient>();
-            var workflowMonitorServiceClientMock = new Mock<IWorkflowMonitorServiceClient>();
-            var durationOptionsMock = new Mock<IOptions<DurationOptions>>();
-            var deserializationMock = new Mock<IDeserialization>();
+            _mockExceptionService = new Mock<IWorkFlowExceptionService>();
+            _mockJobServiceClient = new Mock<IJobServiceClient>();
+            _mockWorkflowMonitorServiceClient = new Mock<IWorkflowMonitorServiceClient>();
+            _mockDeserialization = new Mock<IDeserialization>();
+            _mockDurationOptions = new Mock<IOptions<DurationOptions>>();
+            _mockRetryOptions = new Mock<IOptions<Retry>>();
+            _mockLogger = new Mock<ILogger<Worker>>();
 
-            exceptionServiceMock.Setup(es => es.GetWorkflowExceptions()).Returns(new List<WorkflowException>());
-            durationOptionsMock.Setup(o => o.Value).Returns(new DurationOptions { TimeIntervalInMinutes = 1 });
+            _mockDurationOptions.Setup(o => o.Value).Returns(new DurationOptions { TimeIntervalInMinutes = 1 });
+            _mockRetryOptions.Setup(o => o.Value).Returns(new Retry { Attempts = 3 });
 
-            var worker = new Worker(loggerMock.Object, exceptionServiceMock.Object, jobServiceClientMock.Object,
-                workflowMonitorServiceClientMock.Object, durationOptionsMock.Object, deserializationMock.Object);
-            var stoppingToken = new CancellationTokenSource();
-
-            // Act
-            await worker.StartAsync(stoppingToken.Token);
-            stoppingToken.Cancel(); // Stop the worker
-
-            // Assert
-            loggerMock.Verify(log => log.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("No Exceptions")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+            _worker = new Worker(
+                _mockLogger.Object,
+                _mockExceptionService.Object,
+                _mockJobServiceClient.Object,
+                _mockWorkflowMonitorServiceClient.Object,
+                _mockDurationOptions.Object,
+                _mockDeserialization.Object,
+                _mockRetryOptions.Object
+            );
         }
 
         [Fact]
-        public async Task ExecuteAsync_WithExceptions_ProcessesExceptions()
+        public async Task ProcessWorkflowExceptions_HandlesExceptions()
         {
             // Arrange
-            var loggerMock = new Mock<ILogger<Worker>>();
-            var exceptionServiceMock = new Mock<IWorkFlowExceptionService>();
-            var jobServiceClientMock = new Mock<IJobServiceClient>();
-            var workflowMonitorServiceClientMock = new Mock<IWorkflowMonitorServiceClient>();
-            var durationOptionsMock = new Mock<IOptions<DurationOptions>>();
-            var deserializationMock = new Mock<IDeserialization>();
-            SetEmployeeToEnRouteRequest setEmployeeToEnRouteRequest = new SetEmployeeToEnRouteRequest()
-            { };
-
             var exceptions = new List<WorkflowException>
-        {
-            new WorkflowException
             {
-                Id = Guid.NewGuid(),
-                CreateDate = DateTime.Now,
-                ErrorInfo = "Test Error",
-                IsBusinessError = false,
-                JobNumber = 123,
-                JobSeqNumber = 1,
-                Type = "Enroute",
-                Data = "abc"
-            }
-        };
+                new WorkflowException
+                {
+                    Id = Guid.NewGuid(),
+                    JobNumber = 123,
+                    JobSeqNumber = 1,
+                    Type = "Enroute",
+                    Data = "<xml></xml>"
+                }
+            };
 
-            exceptionServiceMock.Setup(es => es.GetWorkflowExceptions()).Returns(exceptions);
-            durationOptionsMock.Setup(o => o.Value).Returns(new DurationOptions { TimeIntervalInMinutes = 1 });
-            jobServiceClientMock.Setup(js => js.GetJobAsync(It.IsAny<long>())).ReturnsAsync(new Job { JOBTYPE_ID = Constants.INSTALL });
-            deserializationMock.Setup(d => d.TryDeserializeEnrouteFromXml(It.IsAny<string>(), out setEmployeeToEnRouteRequest)).Returns(true);
-
-            workflowMonitorServiceClientMock.Setup(wm => wm.ReprocessEnrouteExceptionsAsync(It.IsAny<WorkflowExceptionRequest>(), It.IsAny<string>()))
+            _mockExceptionService.Setup(s => s.GetWorkflowExceptions()).Returns(exceptions);
+            _mockJobServiceClient.Setup(s => s.GetJobAsync(It.IsAny<long>())).ReturnsAsync(new Job { JOBTYPE_ID = Constants.INSTALL });
+            _mockDeserialization.Setup(d => d.TryDeserializeEnrouteFromXml(It.IsAny<string>(), out It.Ref<SetEmployeeToEnRouteRequest>.IsAny))
+                .Returns((string xml, out SetEmployeeToEnRouteRequest req) =>
+                {
+                    req = new SetEmployeeToEnRouteRequest { adUserName = "testUser" };
+                    return true;
+                });
+            _mockWorkflowMonitorServiceClient.Setup(s => s.ReprocessEnrouteExceptionsAsync(It.IsAny<WorkflowExceptionRequest>(), It.IsAny<string>()))
                 .ReturnsAsync(new StandardSoapResponseOfboolean { ReturnValue = true });
 
-            var worker = new Worker(loggerMock.Object, exceptionServiceMock.Object, jobServiceClientMock.Object,
-                workflowMonitorServiceClientMock.Object, durationOptionsMock.Object, deserializationMock.Object);
-            var stoppingToken = new CancellationTokenSource();
-
             // Act
-            await worker.StartAsync(stoppingToken.Token);
-            stoppingToken.Cancel(); // Stop the worker
+            await _worker.ProcessWorkflowExceptions();
 
             // Assert
-            workflowMonitorServiceClientMock.Verify(wm => wm.ReprocessEnrouteExceptionsAsync(It.IsAny<WorkflowExceptionRequest>(), It.IsAny<string>()), Times.Once);
-            loggerMock.Verify(log => log.Log(
+            _mockLogger.Verify(l => l.Log(
                 LogLevel.Information,
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Successfully retrieved job for job number")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
+
+            _mockLogger.Verify(l => l.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ReprocessEnrouteExceptionsAsync is successfull")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
 
         [Fact]
-        public async Task ExecuteAsync_WithExceptionAndJobNull_LogsJobRetrievalUnsuccessful()
+        public async Task ProcessWorkflowExceptions_HandlesReprocessFailures()
         {
             // Arrange
-            var loggerMock = new Mock<ILogger<Worker>>();
-            var exceptionServiceMock = new Mock<IWorkFlowExceptionService>();
-            var jobServiceClientMock = new Mock<IJobServiceClient>();
-            var workflowMonitorServiceClientMock = new Mock<IWorkflowMonitorServiceClient>();
-            var durationOptionsMock = new Mock<IOptions<DurationOptions>>();
-            var deserializationMock = new Mock<IDeserialization>();
-
             var exceptions = new List<WorkflowException>
-        {
-            new WorkflowException
             {
-                Id = Guid.NewGuid(),
-                CreateDate = DateTime.Now,
-                ErrorInfo = "Test Error",
-                IsBusinessError = false,
-                JobNumber = 123,
-                JobSeqNumber = 1,
-                Type = "Enroute"
-            }
-        };
+                new WorkflowException
+                {
+                    Id = Guid.NewGuid(),
+                    JobNumber = 123,
+                    JobSeqNumber = 1,
+                    Type = "Enroute",
+                    Data = "<xml></xml>"
+                }
+            };
 
-            exceptionServiceMock.Setup(es => es.GetWorkflowExceptions()).Returns(exceptions);
-            durationOptionsMock.Setup(o => o.Value).Returns(new DurationOptions { TimeIntervalInMinutes = 1 });
-            jobServiceClientMock.Setup(js => js.GetJobAsync(It.IsAny<long>())).ReturnsAsync((Job)null);
-
-            var worker = new Worker(loggerMock.Object, exceptionServiceMock.Object, jobServiceClientMock.Object,
-                workflowMonitorServiceClientMock.Object, durationOptionsMock.Object, deserializationMock.Object);
-            var stoppingToken = new CancellationTokenSource();
+            _mockExceptionService.Setup(s => s.GetWorkflowExceptions()).Returns(exceptions);
+            _mockJobServiceClient.Setup(s => s.GetJobAsync(It.IsAny<long>())).ReturnsAsync(new Job { JOBTYPE_ID = Constants.INSTALL });
+            _mockDeserialization.Setup(d => d.TryDeserializeEnrouteFromXml(It.IsAny<string>(), out It.Ref<SetEmployeeToEnRouteRequest>.IsAny))
+                .Returns((string xml, out SetEmployeeToEnRouteRequest req) =>
+                {
+                    req = new SetEmployeeToEnRouteRequest { adUserName = "testUser" };
+                    return true;
+                });
+            _mockWorkflowMonitorServiceClient.Setup(s => s.ReprocessEnrouteExceptionsAsync(It.IsAny<WorkflowExceptionRequest>(), It.IsAny<string>()))
+                .ReturnsAsync((StandardSoapResponseOfboolean)null);
 
             // Act
-            await worker.StartAsync(stoppingToken.Token);
-            stoppingToken.Cancel(); // Stop the worker
+            await _worker.ProcessWorkflowExceptions();
 
             // Assert
-            loggerMock.Verify(log => log.Log(
+            _mockLogger.Verify(l => l.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Retrying RetryReprocessEnrouteExceptionsAsync")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.AtLeastOnce);
+
+            _mockLogger.Verify(l => l.Log(
                 LogLevel.Error,
                 It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Job retrieval was unsuccessfull for Id")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("ReprocessEnrouteExceptionsAsync is unsuccessfull")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
         }
     }
 }
