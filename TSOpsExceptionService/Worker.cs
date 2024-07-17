@@ -62,8 +62,6 @@ public class Worker : BackgroundService
 
                     if (job != null && job.JOBTYPE_ID == Constants.INSTALL)
                     {
-                        _logger.LogInformation("Successfully retrieved job for job number - {id}", exception.JobNumber);
-
                         var request = new WorkflowExceptionRequest
                         {
                             Id = exception.Id,

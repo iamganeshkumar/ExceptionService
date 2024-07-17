@@ -112,7 +112,7 @@ namespace TSOpsExceptionService.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Now getting records greater than"));
+            Assert.Contains(_logger.Logs, log => log.LogLevel == LogLevel.Information && log.Message.Contains("Getting records greater than"));
         }
 
         [Fact]

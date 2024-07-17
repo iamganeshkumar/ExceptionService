@@ -77,12 +77,6 @@ namespace TSOpsExceptionService.Tests
             await _worker.ProcessWorkflowExceptions();
 
             // Assert
-            _mockLogger.Verify(l => l.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Successfully retrieved job for job number")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()), Times.Once);
 
             _mockLogger.Verify(l => l.Log(
                 LogLevel.Information,

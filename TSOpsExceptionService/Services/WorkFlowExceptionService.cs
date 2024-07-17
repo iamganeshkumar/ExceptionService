@@ -26,9 +26,9 @@ namespace TSOpsExceptionService.Services
         }
         public IList<WorkflowException> GetWorkflowExceptions()
         {
+            Stopwatch stopwatch = new Stopwatch();
             try
             {
-                Stopwatch stopwatch = new Stopwatch();
                 var typeOrder = new Dictionary<string, int>
                         {
                             { nameof(ExceptionType.Enroute), 1 },
@@ -36,23 +36,25 @@ namespace TSOpsExceptionService.Services
                             { nameof(ExceptionType.Clear), 3 }
                         };
 
-                if (fistIteration)
+                if (_records.Value.ProcessAllRecords)
                 {
-                    _logger.LogInformation("First iteration is true");
+                    var lastExceptionRecord = _context.LastWorkFlowExceptions.OrderByDescending(i => i.CreateDate).FirstOrDefault();
 
-                    if (_records.Value.ProcessAllRecords)
+                    if (lastExceptionRecord != null)
                     {
-                        _logger.LogInformation("Getting All Records from Database");
+                        _logger.LogInformation("Getting records greater than {date}", lastExceptionRecord.CreateDate?.ToString("yyyy-MM-dd:HH:mm"));
+
                         stopwatch.Start();
 
                         exceptions = _context.WorkflowExceptions
-                            .Where(e => (e.Type == nameof(ExceptionType.Enroute) 
-                            || e.Type == nameof(ExceptionType.Clear) 
-                            || e.Type == nameof(ExceptionType.OnSite))
-                            && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
-                            .ToList()
-                            .OrderBy(e => typeOrder[e.Type])
-                            .ToList();
+                        .Where(e => (e.Type == nameof(ExceptionType.Enroute)
+                        || e.Type == nameof(ExceptionType.Clear)
+                        || e.Type == nameof(ExceptionType.OnSite))
+                        && e.CreateDate > lastExceptionRecord.CreateDate
+                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
+                        .ToList()
+                        .OrderBy(e => typeOrder[e.Type])
+                        .ToList();
 
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
@@ -60,7 +62,29 @@ namespace TSOpsExceptionService.Services
                     }
                     else
                     {
-                        _logger.LogInformation("Getting records from past {days} days", _records.Value.Days);
+                        _logger.LogInformation("Getting All Records from Database which are not reprocessed...");
+
+                        stopwatch.Start();
+
+                        exceptions = _context.WorkflowExceptions
+                        .Where(e => (e.Type == nameof(ExceptionType.Enroute)
+                        || e.Type == nameof(ExceptionType.Clear)
+                        || e.Type == nameof(ExceptionType.OnSite))
+                        && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
+                        .ToList()
+                        .OrderBy(e => typeOrder[e.Type])
+                        .ToList();
+
+                        stopwatch.Stop();
+                        TimeSpan elapsedTime = stopwatch.Elapsed;
+                        _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                    }
+                }
+                else
+                {
+                    if (fistIteration)
+                    {
+                        _logger.LogInformation("Getting records from past {days} days which are not reprocessed...", _records.Value.Days);
                         stopwatch.Start();
 
                         exceptions = _context.WorkflowExceptions
@@ -76,32 +100,42 @@ namespace TSOpsExceptionService.Services
                         stopwatch.Stop();
                         TimeSpan elapsedTime = stopwatch.Elapsed;
                         _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                        fistIteration = false;
                     }
-                    _logger.LogInformation("Retrieved {count} records", exceptions.Count);
-                    SaveLastRecord();
-                    fistIteration = false;
-                }
-
-                else
-                {
-                    var startWithLastException = _context.LastWorkFlowExceptions.OrderByDescending(i => i.CreateDate).FirstOrDefault();
-
-                    if (startWithLastException != null)
+                    else
                     {
-                        _logger.LogInformation("Now getting records greater than {date}", startWithLastException.CreateDate?.ToString("yyyy-MM-dd:HH:mm"));
-                        stopwatch.Start();
-                        exceptions = _context.WorkflowExceptions.Where(i => i.CreateDate > startWithLastException.CreateDate).ToList();
-                        stopwatch.Stop();
-                        TimeSpan elapsedTime = stopwatch.Elapsed;
-                        _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
-                        _logger.LogInformation("Retrieved {count} records greater than {date} date", exceptions.Count, startWithLastException.CreateDate?.ToString("yyyy-MM-dd:HH:mm"));
+                        var lastExceptionRecord = _context.LastWorkFlowExceptions.OrderByDescending(i => i.CreateDate).FirstOrDefault();
 
-                        SaveLastRecord();
+                        if (lastExceptionRecord != null)
+                        {
+                            _logger.LogInformation("Getting records greater than {date}", lastExceptionRecord.CreateDate?.ToString("yyyy-MM-dd:HH:mm"));
+
+                            stopwatch.Start();
+
+                            exceptions = _context.WorkflowExceptions
+                                .Where(e => (e.Type == nameof(ExceptionType.Enroute)
+                                || e.Type == nameof(ExceptionType.Clear)
+                                || e.Type == nameof(ExceptionType.OnSite))
+                                && e.CreateDate > lastExceptionRecord.CreateDate
+                                && !_context.ReprocessedExceptions.Any(re => re.JobNumber == e.JobNumber && re.JobSequenceNo == e.JobSeqNumber))
+                                .ToList()
+                                .OrderBy(e => typeOrder[e.Type])
+                                .ToList();
+
+                            stopwatch.Stop();
+                            TimeSpan elapsedTime = stopwatch.Elapsed;
+                            _logger.LogInformation("Time taken to retieve workflowexceptions from database is: {ElapsedMilliseconds} ms", elapsedTime.TotalMilliseconds);
+                        }
                     }
                 }
+
+
+                _logger.LogInformation("Retrieved {count} records", exceptions.Count);
+                SaveLastRecord();
             }
             catch (Exception ex)
             {
+                if (stopwatch != null) { stopwatch.Stop(); }
                 _logger.LogError("Error in GetWorkflowException() method");
                 _logger.LogError("Detailed Error - " + ex);
             }
