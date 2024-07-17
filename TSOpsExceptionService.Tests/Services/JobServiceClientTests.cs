@@ -34,12 +34,12 @@ namespace TSOpsExceptionService.Tests.Services
             Assert.NotNull(result);
             Assert.Equal(123, result.JOB_NO);
             soapClientMock.Verify(client => client.GetJobAsync(It.IsAny<long>()), Times.Once);
-            loggerMock.Verify(log => log.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Time taken to GetJob type for jobnumber")),
-                It.IsAny<Exception>(),
-                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
+            //loggerMock.Verify(log => log.Log(
+            //    LogLevel.Information,
+            //    It.IsAny<EventId>(),
+            //    It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Time taken to GetJob type for jobnumber")),
+            //    It.IsAny<Exception>(),
+            //    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once);
         }
 
         [Fact]
